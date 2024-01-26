@@ -24,6 +24,9 @@ Alphabetically list all of the country codes in the continent_map table that app
 
 For all countries that have multiple rows in the continent_map table, delete all multiple records leaving only the 1 record per country. The record that you keep should be the first one when sorted by the continent_code alphabetically ascending. Provide the query/ies and explanation of step(s) that you follow to delete these records.<br><br>
 
+<a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_1.sql" target='_blank'>Answer 1</a>.</p><br><br>
+
+  
 2. List the countries ranked 10-12 in each continent by the percent of year-over-year growth descending from 2011 to 2012.<br><br>
 
 The percent of growth should be calculated as: ((2012 gdp - 2011 gdp) / 2011 gdp)<br><br>
@@ -34,22 +37,33 @@ rank<br>
 continent_name<br>
 country_code<br>
 country_name<br>
-growth_percent<br>
+growth_percent<br><br>
+
+<a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_2.sql" target='_blank'>Answer 2</a>.</p><br><br>
+
 3. For the year 2012, create a 3 column, 1 row report showing the percent share of gdp_per_capita for the following regions:<br><br>
 
 (i) Asia, (ii) Europe, (iii) the Rest of the World. Your result should look something like<br><br>
 
 Asia	Europe	Rest of World<br>
-25.0%	25.0%	50.0%<br>
+25.0%	25.0%	50.0%<br><br>
+
+<a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_3.sql" target='_blank'>Answer 3</a>.</p><br><br>
+
 4a. What is the count of countries and sum of their related gdp_per_capita values for the year 2007 where the string 'an' (case insensitive) appears anywhere in the country name?<br><br>
 
 4b. Repeat question 4a, but this time make the query case sensitive.<br><br>
+
+<a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_4.sql" target='_blank'>Answer 4</a>.</p><br><br>
 
 5. Find the sum of gpd_per_capita by year and the count of countries for each year that have non-null gdp_per_capita where (i) the year is before 2012 and (ii) the country has a null gdp_per_capita in 2012. Your result should have the columns:<br><br>
 
 year<br>
 country_count<br>
-total<br>
+total<br><br>
+
+<a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_5.sql" target='_blank'>Answer 5</a>.</p><br><br>
+
 6. All in a single query, execute all of the steps below and provide the results as your final answer:<br><br>
 
 a. create a single list of all per_capita records for year 2009 that includes columns:<br><br>
@@ -70,7 +84,10 @@ continent_name<br>
 country_code<br>
 country_name<br>
 gdp_per_capita<br>
-running_total<br>
+running_total<br><br>
+
+<a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_6.sql" target='_blank'>Answer 6</a>.</p><br><br>
+
 7. Find the country with the highest average gdp_per_capita for each continent for all years. Now compare your list to the following data set. Please describe any and all mistakes that you can find with the data set below. Include any code that you use to help detect these mistakes.<br><br>
 
 rank	continent_name	country_code	country_name	avg_gdp_per_capita<br>
@@ -80,6 +97,8 @@ rank	continent_name	country_code	country_name	avg_gdp_per_capita<br>
 1	North America	BMU	Bermuda	$83,788.48<br>
 1	Oceania	AUS	Australia	$47,070.39<br>
 1	South America	CHL	Chile	$10,781.71</p><br><br>
+
+<a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_7.sql" target='_blank'>Answer 7</a>.</p><br><br>
 
 <ul>
   <p>Programming Language:</p>
