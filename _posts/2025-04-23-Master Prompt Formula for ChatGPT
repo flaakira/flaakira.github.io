@@ -10,111 +10,61 @@ background: 'img/posts/sql_project.jpg'
 <a href="https://github.com/flaakira/Master_Prompt_Formula_for_ChatGPT" target='_blank'>Master Prompt Formula for ChatGPT.</a><br><br>
 
 
+_____________________________________________________________________________________________________________  
+This document outlines a structured approach to crafting effective prompts for ChatGPT using
+a six-word formula: Persona, Context, Task, Format, Exemplar, and Tone. By following this
+formula, users can enhance the quality of interactions with the AI, ensuring that responses are
+tailored to specific needs and expectations.
 
-<p>The first step was importing four CSV files into SQL:</p>
+_____________________________________________________________________________________________________________  
+Persona
+Define the character or role that ChatGPT should embody. This could be a professional, a
+casual friend, or an expert in a specific field. Establishing a clear persona helps set the stage
+for the interaction.
 
-<img src="img/posts/SQL_BrainTree_diagram.png" alt="SQL_Diagram"/><br>
+_____________________________________________________________________________________________________________  
+Context
+Provide background information relevant to the conversation. This includes any necessary
+details that will help ChatGPT understand the situation or topic at hand. Context is crucial for
+generating accurate and relevant responses.
 
-<p>The sequece was answer these questions:</p>
+_____________________________________________________________________________________________________________  
+Task
+Clearly state what you want ChatGPT to do. Whether it's answering a question, providing a
+summary, or generating creative content, specifying the task ensures that the AI focuses on
+the desired outcome.
 
-<p>Code Challenge v2.11<br><br>
-  ______________________________________________________________________________________________________________________________________________________________________
-1. Data Integrity Checking & Cleanup<br><br>
+_____________________________________________________________________________________________________________  
+Format
+Indicate the preferred format for the response. This could be a list, a paragraph, a dialogue,
+or any other structure that suits your needs. Specifying the format helps in organizing the
+information effectively.
 
-Alphabetically list all of the country codes in the continent_map table that appear more than once. Display any values where country_code is null as country_code = "FOO" and make this row appear first in the list, even though it should alphabetically sort to the middle. Provide the results of this query as your answer.<br><br>
+_____________________________________________________________________________________________________________  
+Exemplar
+Offer an example of what you are looking for. This could be a sample response or a specific
+style that you want ChatGPT to emulate. Providing an exemplar can guide the AI in producing
+outputs that align with your expectations.
 
-For all countries that have multiple rows in the continent_map table, delete all multiple records leaving only the 1 record per country. The record that you keep should be the first one when sorted by the continent_code alphabetically ascending. Provide the query/ies and explanation of step(s) that you follow to delete these records.<br><br>
+_____________________________________________________________________________________________________________  
+Tone
+Describe the desired tone of the response. Whether you want it to be formal, informal,
+humorous, or serious, specifying the tone helps in shaping the overall feel of the interaction.
 
-<h2><a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_1.sql" target='_blank'>Link to SQL query - Answer 1</a></h2><br>
 
- 
-  ______________________________________________________________________________________________________________________________________________________________________ 
-2. List the countries ranked 10-12 in each continent by the percent of year-over-year growth descending from 2011 to 2012.<br><br>
-
-The percent of growth should be calculated as: ((2012 gdp - 2011 gdp) / 2011 gdp)<br><br>
-
-The list should include the columns:<br><br>
-
-rank<br>
-continent_name<br>
-country_code<br>
-country_name<br>
-growth_percent<br><br>
-
-<h2><a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_2.sql" target='_blank'>Link to SQL query - Answer 2</a></h2><br>
-
-  
-  ______________________________________________________________________________________________________________________________________________________________________
-3. For the year 2012, create a 3 column, 1 row report showing the percent share of gdp_per_capita for the following regions:<br><br>
-
-(i) Asia, (ii) Europe, (iii) the Rest of the World. Your result should look something like<br><br>
-
-Asia	Europe	Rest of World<br>
-25.0%	25.0%	50.0%<br><br>
-
-<h2><a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_3.sql" target='_blank'>Link to SQL query - Answer 3</a></h2><br>
-
-  ______________________________________________________________________________________________________________________________________________________________________
-4a. What is the count of countries and sum of their related gdp_per_capita values for the year 2007 where the string 'an' (case insensitive) appears anywhere in the country name?<br><br>
-
-4b. Repeat question 4a, but this time make the query case sensitive.<br><br>
-
-<h2><a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_4.sql" target='_blank'>Link to SQL query - Answer 4</a></h2><br><br>
+_____________________________________________________________________________________________________________  
+By utilizing this six-word formula, users can create prompts that lead to more engaging and
+relevant conversations with ChatGPT, ultimately enhancing the overall experience.
 
   
   ______________________________________________________________________________________________________________________________________________________________________
-5. Find the sum of gpd_per_capita by year and the count of countries for each year that have non-null gdp_per_capita where (i) the year is before 2012 and (ii) the country has a null gdp_per_capita in 2012. Your result should have the columns:<br><br>
+<h2>Info Source </h2><br><br>
 
-year<br>
-country_count<br>
-total<br><br>
-
-<h2><a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_5.sql" target='_blank'>Link to SQL query - Answer 5</a></h2><br>
-
-  
-  ______________________________________________________________________________________________________________________________________________________________________
-6. All in a single query, execute all of the steps below and provide the results as your final answer:<br><br>
-
-a. create a single list of all per_capita records for year 2009 that includes columns:<br><br>
-
-continent_name<br>
-country_code<br>
-country_name<br>
-gdp_per_capita<br><br>
-b. order this list by:<br><br>
-
-continent_name ascending<br>
-characters 2 through 4 (inclusive) of the country_name descending<br>
-c. create a running total of gdp_per_capita by continent_name<br><br>
-
-d. return only the first record from the ordered list for which each continent's running total of gdp_per_capita meets or exceeds $70,000.00 with the following columns:<br>
-
-continent_name<br>
-country_code<br>
-country_name<br>
-gdp_per_capita<br>
-running_total<br><br>
-
-<h2><a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_6.sql" target='_blank'>Link to SQL query - Answer 6</a></h2><br><br>
-
-  
-  ______________________________________________________________________________________________________________________________________________________________________
-7. Find the country with the highest average gdp_per_capita for each continent for all years. Now compare your list to the following data set. Please describe any and all mistakes that you can find with the data set below. Include any code that you use to help detect these mistakes.<br><br>
-<br><br>
-
-<h2><a href="https://github.com/flaakira/BrainTree_SQL_Coding_Challenge_Data_Analyst/blob/master/Answers/Answer_7.sql" target='_blank'>Link to SQL query - Answer 7</a></h2><br>
-
-  
-  ______________________________________________________________________________________________________________________________________________________________________
-<h2>Extra </h2><br><br>
-  <p>This is a Power Bi Report, where I imported directly from SQL Management Studio (query) to Power Bi.</p><br>
-  <p>This way I could show the formulas and results online from this SQL Data Analyst Challenge.</p><br><br>
+<h2><a href="https://www.youtube.com/watch?v=jC4v5AS4RIM">Master the Perfect ChatGPT Prompt Formula (in just 8 minutes)! from Jeff Su </a></h2><br>
 
 
 
-<h2><a href="https://app.powerbi.com/view?r=eyJrIjoiZGI0ZmNmMmMtNjIyNi00OWI2LWE4OTctMjIwOGM5Njc4OTc5IiwidCI6IjJiNDA1ZDYwLTdhMjktNDcwYS1iNzc4LTU1ZDViMjQyYTdiYSJ9" target='_blank'>Link to Power Bi - Answers Report</a></h2><br>
-
- <p>* Just the first question I didn`t answer in the Power BI, because that was one ETL process.But you can check the process direct on the link Answer 1.</p>
-  <p>Programming Language:</p>
-    <li>SQL</li>
+  <p>Portal AI Sources</p>
+    <li>ChatGPT</li>
+    <li>napkin.AI</li>
   </ul>
