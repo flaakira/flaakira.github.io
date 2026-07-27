@@ -10,6 +10,25 @@
 #mainNav .navbar-toggler svg {
     color: #000000;
 }
-#mainNav .navbar-nav .nav-link {
+
+// Force menu links black at all screen sizes (overrides theme's white links >=992px)
+#mainNav .navbar-nav .nav-link,
+#mainNav .navbar-nav > li.nav-item > a {
     color: #000000;
+}
+#mainNav .navbar-nav .nav-link:hover,
+#mainNav .navbar-nav .nav-link:focus,
+#mainNav .navbar-nav > li.nav-item > a:hover,
+#mainNav .navbar-nav > li.nav-item > a:focus {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+@media only screen and (min-width: 992px) {
+    #mainNav .navbar-nav > li.nav-item > a {
+        color: #000000;
+    }
+    #mainNav .navbar-nav > li.nav-item > a:hover,
+    #mainNav .navbar-nav > li.nav-item > a:focus {
+        color: rgba(0, 0, 0, 0.6);
+    }
 }
