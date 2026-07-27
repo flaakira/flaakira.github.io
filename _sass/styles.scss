@@ -1,43 +1,15 @@
 // Import Core Clean Blog SCSS
 @import "../assets/vendor/startbootstrap-clean-blog/scss/styles.scss";
 
-// Custom: fixed white header, always collapsed hamburger menu
-#mainNav {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background-color: #ffffff;
-    border-bottom: 1px solid #e9ecef;
-}
-body {
-    padding-top: 60px;
-}
-
-// Hamburger icon + Menu label in black
+// Custom: black hamburger (☰) menu icon and links (visible on white navbar)
 #mainNav .navbar-toggler {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
     color: #000000;
-    border-color: rgba(0, 0, 0, 0.6);
+    border-color: rgba(0, 0, 0, 0.3);
 }
 #mainNav .navbar-toggler i,
-#mainNav .navbar-toggler .menu-label {
+#mainNav .navbar-toggler svg {
     color: #000000;
 }
-#mainNav .navbar-toggler .menu-label {
-    font-size: 12px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-// Open menu links in black
-#navbarResponsive .nav-item .nav-link,
-#navbarResponsive a {
+#mainNav .navbar-nav .nav-link {
     color: #000000;
-}
-#navbarResponsive .nav-item .nav-link:hover,
-#navbarResponsive a:hover {
-    color: #0085a1;
 }
