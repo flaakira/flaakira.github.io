@@ -1,0 +1,70 @@
+---
+layout: post
+title: "Creating a recursive menu ☰"
+subtitle: "Turning the Clean Blog navbar into an always-collapsed hamburger menu with a white icon"
+background: 'img/posts/markdown_project.jpg'
+---
+
+<h1>Project:</h1>
+
+<a href="https://flaakira.github.io/" target='_blank'>My Portfolio Blog: flaakira</a>
+
+<p>This post documents how I converted the site's top navigation into a compact <b>hamburger (☰) menu</b> that stays collapsed on every screen size and opens to reveal the links. It covers the folders involved, the exact code edits, and how the changes were committed on GitHub.</p>
+
+<br>
+
+<h2>Where the navigation lives</h2>
+
+<p>The Clean Blog Jekyll theme keeps its navigation in an include file, and its styling comes from a vendored SCSS file:</p>
+
+<ul>
+<li><b>Navbar markup:</b> <code>_includes/navbar.html</code></li>
+<li><b>Styles (imported):</b> <code>_sass/styles.scss</code>, which imports <code>assets/vendor/startbootstrap-clean-blog/scss/styles.scss</code></li>
+</ul>
+
+<h2>Step 1 &mdash; Always show the ☰ icon</h2>
+
+<p>Bootstrap's <code>navbar-expand-lg</code> class spreads the links across the top on wide screens and hides the toggle. Removing that class keeps the navbar collapsed at all sizes, so the ☰ toggle is always visible and the links only appear when clicked.</p>
+
+<pre><code>&lt;!-- Before --&gt;
+&lt;nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav"&gt;
+
+&lt;!-- After --&gt;
+&lt;nav class="navbar navbar-light fixed-top" id="mainNav"&gt;</code></pre>
+
+<h2>Step 2 &mdash; Clean up the toggle button</h2>
+
+<p>The original button showed the word "Menu" next to the icon. Removing that text leaves just the clean three-dashes icon.</p>
+
+<pre><code>&lt;button class="navbar-toggler navbar-toggler-right" type="button"
+        data-toggle="collapse" data-target="#navbarResponsive"
+        aria-controls="navbarResponsive" aria-expanded="false"
+        aria-label="Toggle navigation"&gt;
+  &lt;i class="fa fa-bars"&gt;&lt;/i&gt;
+&lt;/button&gt;</code></pre>
+
+<h2>Step 3 &mdash; Make the icon white</h2>
+
+<p>To make the ☰ icon stand out against the hero image, a small CSS rule was added to <code>_sass/styles.scss</code> to color it white:</p>
+
+<pre><code>#mainNav .navbar-toggler {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+#mainNav .navbar-toggler i {
+    color: #ffffff;
+}</code></pre>
+
+<h2>Step 4 &mdash; Commit on GitHub</h2>
+
+<p>The edits were made through GitHub's web editor and committed to the <code>master</code> branch. Because the site is hosted on GitHub Pages, Jekyll rebuilds automatically, and the new ☰ menu goes live within a minute.</p>
+
+<ul>
+<li>Edited <code>_includes/navbar.html</code> and committed.</li>
+<li>Added the white-icon CSS rule to <code>_sass/styles.scss</code> and committed.</li>
+<li>Verified the result on the live site: <a href="https://flaakira.github.io/" target='_blank'>flaakira.github.io</a>.</li>
+</ul>
+
+<h2>Result</h2>
+
+<p>The navigation is now a single ☰ icon in the top-left corner. Clicking it opens a vertical list of links (Home, Posts, Linkedin, Github, About me), giving the site a cleaner, more modern header that behaves consistently across desktop and mobile.</p>
