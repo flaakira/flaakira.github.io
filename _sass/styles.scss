@@ -1,2 +1,11 @@
 // Import Core Clean Blog SCSS
 @import "../assets/vendor/startbootstrap-clean-blog/scss/styles.scss";
+
+// Custom: white hamburger (☰) menu icon
+#mainNav .navbar-toggler {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+#mainNav .navbar-toggler i {
+    color: #ffffff;
+}
