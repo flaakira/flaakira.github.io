@@ -1,0 +1,174 @@
+<!-- Animated data-visualisation hero (6 scenes, 3s each) -->
+<div id="hero-charts" aria-hidden="true">
+  <svg id="hero-svg" viewBox="0 0 1200 540" preserveAspectRatio="xMidYMid slice"></svg>
+</div>
+{% raw %}
+<script>
+(function () {
+  var svg = document.getElementById('hero-svg');
+  if (!svg) { return; }
+
+  var C = ['#4fd1c5', '#f6ad55', '#b794f4', '#63b3ed', '#f687b3', '#68d391'];
+  var CX = 600, CY = 350, BASE = 500;
+
+  function grid() {
+    var s = '', x, y;
+    for (x = 0; x <= 1200; x += 60) {
+      s += '<line x1="' + x + '" y1="0" x2="' + x + '" y2="540" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>';
+    }
+    for (y = 0; y <= 540; y += 60) {
+      s += '<line x1="0" y1="' + y + '" x2="1200" y2="' + y + '" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>';
+    }
+    return s;
+  }
+
+  /* Scene 1 - growing bars */
+  function sBar() {
+    var n = 18, w = 38, gap = 18, total = n * w + (n - 1) * gap, x0 = CX - total / 2;
+    var s = '', i, h, x;
+    for (i = 0; i < n; i++) {
+      h = 60 + Math.round(Math.abs(Math.sin(i * 0.7)) * 200) + (i % 3) * 20;
+      x = x0 + i * (w + gap);
+      s += '<rect class="bar" x="' + x + '" y="' + (BASE - h) + '" width="' + w + '" height="' + h + '" rx="6" fill="' + C[i % 6] + '" opacity="0.9" style="transform-origin:' + (x + w / 2) + 'px ' + BASE + 'px; animation-delay:' + (i * 0.06).toFixed(2) + 's"/>';
+    }
+    s += '<line x1="' + x0 + '" y1="' + BASE + '" x2="' + (x0 + total) + '" y2="' + BASE + '" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>';
+    return s;
+  }
+
+  /* Scene 2 - self drawing trend lines */
+  function sLine() {
+    var s = '', i, j, x, y, pts, dots;
+    s += '<line x1="120" y1="' + BASE + '" x2="1080" y2="' + BASE + '" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>';
+    s += '<line x1="120" y1="140" x2="120" y2="' + BASE + '" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>';
+    for (j = 0; j < 3; j++) {
+      pts = ''; dots = '';
+      for (i = 0; i <= 12; i++) {
+        x = 120 + i * 80;
+        y = BASE - 60 - Math.round((Math.sin(i * 0.55 + j * 1.3) + 1) * 70) - j * 45;
+        pts += x + ',' + y + ' ';
+        dots += '<circle class="dot" cx="' + x + '" cy="' + y + '" r="6" fill="' + C[j] + '" style="transform-origin:' + x + 'px ' + y + 'px; animation-delay:' + (0.5 + i * 0.06).toFixed(2) + 's"/>';
+      }
+      s += '<polyline class="pline" points="' + pts + '" fill="none" stroke="' + C[j] + '" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" style="animation-delay:' + (j * 0.2).toFixed(2) + 's"/>' + dots;
+    }
+    return s;
+  }
+
+  /* Scene 3 - donut */
+  function sPie() {
+    var vals = [24, 19, 17, 15, 13, 12], r = 150, ir = 85, a = -Math.PI / 2, s = '', i;
+    for (i = 0; i < vals.length; i++) {
+      var frac = vals[i] / 100, a2 = a + frac * Math.PI * 2, large = frac > 0.5 ? 1 : 0;
+      var x1 = (CX + r * Math.cos(a)).toFixed(2), y1 = (CY + r * Math.sin(a)).toFixed(2);
+      var x2 = (CX + r * Math.cos(a2)).toFixed(2), y2 = (CY + r * Math.sin(a2)).toFixed(2);
+      var x3 = (CX + ir * Math.cos(a2)).toFixed(2), y3 = (CY + ir * Math.sin(a2)).toFixed(2);
+      var x4 = (CX + ir * Math.cos(a)).toFixed(2), y4 = (CY + ir * Math.sin(a)).toFixed(2);
+      var d = 'M' + x1 + ' ' + y1 + ' A' + r + ' ' + r + ' 0 ' + large + ' 1 ' + x2 + ' ' + y2 + ' L' + x3 + ' ' + y3 + ' A' + ir + ' ' + ir + ' 0 ' + large + ' 0 ' + x4 + ' ' + y4 + ' Z';
+      s += '<path class="slice" d="' + d + '" fill="' + C[i] + '" opacity="0.92" style="transform-origin:' + CX + 'px ' + CY + 'px; animation-delay:' + (i * 0.1).toFixed(2) + 's"/>';
+      a = a2;
+    }
+    s += '<text class="ctext" x="' + CX + '" y="' + (CY + 15) + '" text-anchor="middle" font-size="44" font-weight="700" fill="#ffffff" style="transform-origin:' + CX + 'px ' + CY + 'px">100%</text>';
+    return s;
+  }
+
+  /* Scene 4 - globe with pinging locations */
+  function sMap() {
+    var R = 170, s = '', i, k;
+    s += '<circle cx="' + CX + '" cy="' + CY + '" r="' + R + '" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>';
+    for (i = 1; i <= 4; i++) {
+      var yy = CY - R + i * (2 * R / 5);
+      var rx = Math.sqrt(Math.max(R * R - (yy - CY) * (yy - CY), 0));
+      s += '<ellipse cx="' + CX + '" cy="' + yy.toFixed(1) + '" rx="' + rx.toFixed(1) + '" ry="' + (rx * 0.18).toFixed(1) + '" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>';
+    }
+    for (k = 0; k < 5; k++) {
+      var rx2 = Math.abs(R * Math.cos(k * Math.PI / 5));
+      s += '<ellipse cx="' + CX + '" cy="' + CY + '" rx="' + rx2.toFixed(1) + '" ry="' + R + '" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>';
+    }
+    var pins = [[520, 270], [665, 245], [575, 385], [700, 410], [490, 350], [640, 320]];
+    for (i = 0; i < pins.length; i++) {
+      s += '<circle class="ping" cx="' + pins[i][0] + '" cy="' + pins[i][1] + '" r="10" fill="none" stroke="' + C[i] + '" stroke-width="3" style="transform-origin:' + pins[i][0] + 'px ' + pins[i][1] + 'px; animation-delay:' + (i * 0.3).toFixed(2) + 's"/>';
+      s += '<circle cx="' + pins[i][0] + '" cy="' + pins[i][1] + '" r="5" fill="' + C[i] + '"/>';
+    }
+    var arcs = [[520, 270, 700, 410], [490, 350, 665, 245], [575, 385, 640, 320]];
+    for (i = 0; i < arcs.length; i++) {
+      var a = arcs[i], mx = (a[0] + a[2]) / 2, my = (a[1] + a[3]) / 2 - 95;
+      s += '<path class="arc" d="M' + a[0] + ' ' + a[1] + ' Q' + mx + ' ' + my + ' ' + a[2] + ' ' + a[3] + '" fill="none" stroke="' + C[i + 1] + '" stroke-width="3" stroke-linecap="round" style="animation-delay:' + (i * 0.35).toFixed(2) + 's"/>';
+    }
+    return s;
+  }
+
+  /* Scene 5 - bubbles */
+  function sBubble() {
+    var s = '', i, seed = 7;
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    s += '<line x1="150" y1="' + BASE + '" x2="1050" y2="' + BASE + '" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>';
+    s += '<line x1="150" y1="160" x2="150" y2="' + BASE + '" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>';
+    for (i = 0; i < 24; i++) {
+      var x = Math.round(185 + rnd() * 830), y = Math.round(190 + rnd() * 280), r = Math.round(12 + rnd() * 34);
+      s += '<circle class="bub" cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + C[i % 6] + '" opacity="0.55" style="transform-origin:' + x + 'px ' + y + 'px; animation-delay:' + (i * 0.05).toFixed(2) + 's"/>';
+    }
+    return s;
+  }
+
+  /* Scene 6 - radar */
+  function sRadar() {
+    var N = 7, R = 165, s = '', i, ring, a, rr, pts;
+    for (ring = 1; ring <= 4; ring++) {
+      pts = '';
+      for (i = 0; i < N; i++) {
+        a = -Math.PI / 2 + i * 2 * Math.PI / N; rr = R * ring / 4;
+        pts += (CX + rr * Math.cos(a)).toFixed(1) + ',' + (CY + rr * Math.sin(a)).toFixed(1) + ' ';
+      }
+      s += '<polygon points="' + pts + '" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/>';
+    }
+    for (i = 0; i < N; i++) {
+      a = -Math.PI / 2 + i * 2 * Math.PI / N;
+      s += '<line x1="' + CX + '" y1="' + CY + '" x2="' + (CX + R * Math.cos(a)).toFixed(1) + '" y2="' + (CY + R * Math.sin(a)).toFixed(1) + '" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/>';
+    }
+    var data = [[0.9, 0.7, 0.85, 0.6, 0.95, 0.75, 0.8], [0.6, 0.9, 0.55, 0.85, 0.6, 0.95, 0.5]];
+    for (var d = 0; d < 2; d++) {
+      pts = '';
+      for (i = 0; i < N; i++) {
+        a = -Math.PI / 2 + i * 2 * Math.PI / N; rr = R * data[d][i];
+        pts += (CX + rr * Math.cos(a)).toFixed(1) + ',' + (CY + rr * Math.sin(a)).toFixed(1) + ' ';
+      }
+      var col = d ? C[2] : C[0];
+      s += '<polygon class="rpoly" points="' + pts + '" fill="' + col + '" fill-opacity="0.25" stroke="' + col + '" stroke-width="3" style="transform-origin:' + CX + 'px ' + CY + 'px; animation-delay:' + (d * 0.25) + 's"/>';
+    }
+    return s;
+  }
+
+  var builders = [sBar, sLine, sPie, sMap, sBubble, sRadar];
+  var html = '<g class="hgrid">' + grid() + '</g>';
+  var i;
+  for (i = 0; i < builders.length; i++) {
+    html += '<g class="scene" id="hscene' + i + '">' + builders[i]() + '</g>';
+  }
+  svg.innerHTML = html;
+
+  var scenes = [], snapshot = [];
+  for (i = 0; i < builders.length; i++) {
+    var g = document.getElementById('hscene' + i);
+    scenes.push(g);
+    snapshot.push(g.innerHTML);
+  }
+
+  function show(n) {
+    for (var k = 0; k < scenes.length; k++) {
+      if (k === n) {
+        scenes[k].innerHTML = snapshot[k];
+        scenes[k].classList.add('on');
+      } else {
+        scenes[k].classList.remove('on');
+      }
+    }
+  }
+
+  var idx = 0;
+  show(0);
+  setInterval(function () {
+    idx = (idx + 1) % scenes.length;
+    show(idx);
+  }, 3000);
+})();
+</script>
+{% endraw %}
