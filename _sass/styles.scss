@@ -32,3 +32,12 @@
         color: rgba(0, 0, 0, 0.6);
     }
 }
+
+// Keep the header pinned to the top of the screen when the menu is opened
+#mainNav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+}
