@@ -66,7 +66,7 @@
       s += '<path class="slice" d="' + d + '" fill="' + C[i] + '" opacity="0.92" style="transform-origin:' + CX + 'px ' + CY + 'px; animation-delay:' + (i * 0.1).toFixed(2) + 's"/>';
       var am = (a + a2) / 2, lr = (r + ir) / 2;
       var lx = (CX + lr * Math.cos(am)).toFixed(1), ly = (CY + lr * Math.sin(am) + 8).toFixed(1);
-      labels += '<text class="ptext" x="' + lx + '" y="' + ly + '" text-anchor="middle" font-size="24" font-weight="700" fill="#0f2027" style="transform-origin:' + lx + 'px ' + ly + 'px; animation-delay:' + (0.35 + i * 0.1).toFixed(2) + 's">' + vals[i] + '%</text>';
+      labels += '<text class="ptext" x="' + lx + '" y="' + ly + '" text-anchor="middle" font-size="24" font-weight="700" fill="#ffffff" style="transform-origin:' + lx + 'px ' + ly + 'px; animation-delay:' + (0.35 + i * 0.1).toFixed(2) + 's">' + vals[i] + '%</text>';
       a = a2;
     }
     return s + labels;
