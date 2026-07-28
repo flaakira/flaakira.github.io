@@ -53,9 +53,9 @@
     return s;
   }
 
-  /* Scene 3 - donut */
+  /* Scene 3 - donut with a percentage on every slice */
   function sPie() {
-    var vals = [24, 19, 17, 15, 13, 12], r = 150, ir = 85, a = -Math.PI / 2, s = '', i;
+    var vals = [24, 19, 17, 15, 13, 12], r = 150, ir = 85, a = -Math.PI / 2, s = '', labels = '', i;
     for (i = 0; i < vals.length; i++) {
       var frac = vals[i] / 100, a2 = a + frac * Math.PI * 2, large = frac > 0.5 ? 1 : 0;
       var x1 = (CX + r * Math.cos(a)).toFixed(2), y1 = (CY + r * Math.sin(a)).toFixed(2);
@@ -64,10 +64,12 @@
       var x4 = (CX + ir * Math.cos(a)).toFixed(2), y4 = (CY + ir * Math.sin(a)).toFixed(2);
       var d = 'M' + x1 + ' ' + y1 + ' A' + r + ' ' + r + ' 0 ' + large + ' 1 ' + x2 + ' ' + y2 + ' L' + x3 + ' ' + y3 + ' A' + ir + ' ' + ir + ' 0 ' + large + ' 0 ' + x4 + ' ' + y4 + ' Z';
       s += '<path class="slice" d="' + d + '" fill="' + C[i] + '" opacity="0.92" style="transform-origin:' + CX + 'px ' + CY + 'px; animation-delay:' + (i * 0.1).toFixed(2) + 's"/>';
+      var am = (a + a2) / 2, lr = (r + ir) / 2;
+      var lx = (CX + lr * Math.cos(am)).toFixed(1), ly = (CY + lr * Math.sin(am) + 8).toFixed(1);
+      labels += '<text class="ptext" x="' + lx + '" y="' + ly + '" text-anchor="middle" font-size="24" font-weight="700" fill="#0f2027" style="transform-origin:' + lx + 'px ' + ly + 'px; animation-delay:' + (0.35 + i * 0.1).toFixed(2) + 's">' + vals[i] + '%</text>';
       a = a2;
     }
-    s += '<text class="ctext" x="' + CX + '" y="' + (CY + 15) + '" text-anchor="middle" font-size="44" font-weight="700" fill="#ffffff" style="transform-origin:' + CX + 'px ' + CY + 'px">100%</text>';
-    return s;
+    return s + labels;
   }
 
   /* Scene 4 - globe with pinging locations */
