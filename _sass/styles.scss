@@ -116,8 +116,8 @@ header.masthead.hero .page-heading .subheading {
 #hero-charts .scene.on .slice {
     animation: sliceIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-#hero-charts .scene.on .ctext {
-    animation: popIn 0.6s ease 0.45s both;
+#hero-charts .scene.on .ptext {
+    animation: popIn 0.5s ease both;
 }
 #hero-charts .scene.on .ping {
     animation: pingOut 1.8s ease-out infinite;
