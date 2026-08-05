@@ -1,0 +1,56 @@
+---
+layout: post
+title: "What Do Data Analyst Job Postings Actually Ask For?"
+subtitle: "A small scrape + Claude extraction + analysis pipeline."
+background: '/img/posts/webscraping.jpg'
+---
+
+<h1>Project:</h1>
+
+<a href="https://github.com/flaakira/data-analyst-job-market" target='_blank'>Code Repository</a><br><br>
+
+<p>I wanted to try a small end-to-end pipeline: pull real job postings, have an LLM (Claude) read the unstructured descriptions and pull out structured skills/tools, then see what actually shows up most. Here's what I found looking at 18 current "Data Analyst" postings pulled from RemoteOK's public job API.</p>
+
+<h2>Method</h2>
+
+<ol>
+  <li><b>Fetch:</b> Queried RemoteOK's public API (remoteok.com/api) across a few relevant tags (analytics, data, sql, business-intelligence), de-duplicated results, and filtered down to postings whose title matched Data Analyst / BI Analyst / Analytics Engineer patterns.</li><br>
+  <li><b>Extract:</b> Each posting's raw HTML description is cleaned up and passed to Claude with a prompt asking it to return structured JSON &mdash; the specific tools/skills mentioned, seniority level, employment type, and salary range if stated. This is the part that would be painful with regex alone, since postings phrase requirements very differently.</li><br>
+  <li><b>Aggregate:</b> Counted how often each skill appeared across postings and charted the top ones.</li>
+</ol>
+
+<h2>What showed up most</h2>
+
+<img src="/img/posts/job-market-top-skills.png" alt="Top skills chart"><br><br>
+
+<ol>
+  <li><b>Excel</b> &mdash; mentioned in 11/18 postings (61%)</li>
+  <li><b>SQL</b> &mdash; mentioned in 10/18 postings (56%)</li>
+  <li><b>Python</b> &mdash; mentioned in 8/18 postings (44%)</li>
+  <li><b>Tableau</b> &mdash; mentioned in 8/18 postings (44%)</li>
+  <li><b>Power BI</b> &mdash; mentioned in 8/18 postings (44%)</li>
+  <li><b>Looker</b> &mdash; mentioned in 4/18 postings (22%)</li>
+  <li><b>ETL</b> &mdash; mentioned in 4/18 postings (22%)</li>
+  <li><b>Pandas</b> &mdash; mentioned in 4/18 postings (22%)</li>
+  <li><b>Snowflake</b> &mdash; mentioned in 3/18 postings (17%)</li>
+  <li><b>BigQuery</b> &mdash; mentioned in 3/18 postings (17%)</li>
+</ol>
+
+<h2>A few observations</h2>
+
+<p>Excel and SQL are still the baseline expectation, not just Python &mdash; worth remembering if a portfolio leans all-Python.</p>
+<p>Power BI and Tableau show up about equally often; it may not be worth over-specializing in just one BI tool.</p>
+<p>Cloud warehouses (Snowflake, BigQuery, Redshift) show up in a meaningful minority of postings &mdash; a "nice to have" signal for standing out, not yet a baseline requirement in this sample.</p>
+
+<h2>Caveats</h2>
+
+<p>This is a small, single-snapshot sample (18 postings) from one job board that skews toward remote/tech-forward companies, so it's directional, not a market survey. Re-running this weekly and tracking how the skill mix shifts over time would be a more convincing follow-up.</p>
+
+<ul>
+  <p>Tools & Process:</p>
+    <li>Python</li>
+    <li>RemoteOK Public API</li>
+    <li>Claude (Anthropic API)</li>
+    <li>Pandas</li>
+    <li>Matplotlib</li>
+  </ul>
