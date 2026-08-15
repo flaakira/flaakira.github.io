@@ -5,6 +5,8 @@ subtitle: "A step-by-step walk through the data, the state object, and the rende
 background: '/img/posts/true-or-woof.png'
 ---
 
+<p><b>&#9654; Play it now: <a href="https://flaakira.github.io/true-or-woof/" target='_blank'>flaakira.github.io/true-or-woof</a></b></p>
+
 <h1>Project:</h1>
 
 <a href="https://flaakira.github.io/true-or-woof/" target='_blank'>Play the game</a> &middot; <a href="https://github.com/flaakira/true-or-woof" target='_blank'>Code Repository</a><br><br>
@@ -206,6 +208,20 @@ updatePoolCount();</code></pre>
 <h2>What I took from it</h2>
 
 <p>The interesting part was not the JavaScript, it was the data work: a public API that no longer answers, a static dataset that still does, and the realisation that a trivia game needs <i>wrong</i> answers as much as right ones. Writing 43 believable fakes turned out to be harder &mdash; and more fun &mdash; than writing the game loop.</p>
+
+<h2>What this taught me as a data analyst</h2>
+
+<p>The game is the fun part, but the work behind it is the same work I do as an analyst. Five things stuck with me.</p>
+
+<p><b>1. A dead API is not a dead dataset.</b> The Dog Facts endpoint stopped answering when Heroku retired its free dynos, but the project's static <code>data.json</code> was still sitting in the repository. An endpoint is only one door into a dataset &mdash; raw JSON files, static dumps, mirrors and CSV exports are usually still open. Before writing off a source, go looking for the other doors.</p>
+
+<p><b>2. Ingest, transform, export.</b> The prep was plain Python 3: <code>urllib</code> to pull the raw payload, <code>json</code> to parse the nested response into flat records, string cleaning to normalise the text, and <code>csv</code> to write the curated output. Exactly the same three moves as any ETL job at work, just at a smaller scale and with dogs in it.</p>
+
+<p><b>3. Filtering is a judgement call, and the criteria have to be written down.</b> Out of 435 raw facts I kept 43: short, unambiguous, one topic each. Curation is where quality beats volume &mdash; but only if the rule you applied is explicit enough to apply again next month and get the same answer.</p>
+
+<p><b>4. Class balance is a metric-design decision.</b> 43 true and 43 false is deliberate: it pins the baseline at exactly 50%, so any score above it actually means something. Anyone who has evaluated a model on an imbalanced dataset knows the alternative &mdash; an accuracy number that looks impressive and says nothing at all.</p>
+
+<p><b>5. Schema first, interface second.</b> Every record carries the same three keys, and the topic buttons are derived from the data rather than hard-coded. Get the schema right and the layer sitting on top maintains itself &mdash; that is true for a trivia game, and just as true for a dashboard.</p>
 
 <ul>
 <p>Tools &amp; Process:</p>
