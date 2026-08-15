@@ -1,0 +1,217 @@
+---
+layout: post
+title: "True or Woof: A Dog-Facts Trivia Game in One HTML File"
+subtitle: "A step-by-step walk through the data, the state object, and the render loop."
+background: '/img/posts/true-or-woof.png'
+---
+
+<h1>Project:</h1>
+
+<a href="https://flaakira.github.io/true-or-woof/" target='_blank'>Play the game</a> &middot; <a href="https://github.com/flaakira/true-or-woof" target='_blank'>Code Repository</a><br><br>
+
+<p><b>True or Woof</b> is a small trivia game: a statement about dogs appears on an index card, you call it True or False, confirm, and find out whether you got played. Half the statements are real facts and half are fakes I planted on purpose. The whole thing is a single <code>index.html</code> &mdash; no framework, no build step, no runtime dependency. This post walks through how it works, piece by piece.</p>
+
+<img src="/img/posts/true-or-woof.png" alt="True or Woof card screen"><br><br>
+
+<h2>Where the facts came from</h2>
+
+<p>The source is the public <b>Dog Facts API</b> dataset. Its live endpoint has been dead since Heroku retired free dynos, so instead of calling it I read the project's static <code>data.json</code> (435 facts) straight from GitHub. From there I picked <b>43</b> facts that were short, clear, and about a single topic, and hand-wrote a false twin for each one &mdash; usually by swapping the key number, name, or claim.</p>
+
+<p>That gives a balanced pool of <b>86 statements: 43 true, 43 false</b>, spread across 8 topics (Anatomy &amp; Senses, Behavior &amp; Cognition, Breeds, Evolution &amp; Domestication, Health &amp; Safety, History &amp; Culture, Records &amp; Extremes, Reproduction &amp; Puppies). The 1:1 balance matters: it means guessing "true" every time scores exactly 50%, so the score actually measures something.</p>
+
+<h2>Step 1 &mdash; One page, three screens</h2>
+
+<p>There is no router and no page navigation. The markup holds three <code>&lt;section&gt;</code> blocks, and the game just adds or removes a <code>hidden</code> class to decide which one is on screen.</p>
+
+<pre><code>&lt;section id="screen-setup"&gt;    ... topic picker + Start round
+&lt;section id="screen-play"&gt;     ... the card, True/False, Confirm
+&lt;section id="screen-results"&gt;  ... score, rank, Play again</code></pre>
+
+<h2>Step 2 &mdash; The data is baked into the page</h2>
+
+<p>The question bank lives in a JSON script tag rather than a separate file, so the game never makes a network request at runtime. Each item has the same three keys.</p>
+
+<pre><code>&lt;script type="application/json" id="game-data"&gt;
+[
+  {"topic": "Anatomy &amp; Senses", "statement": "Most dogs have 42 teeth.", "isTrue": true},
+  {"topic": "Anatomy &amp; Senses", "statement": "Most dogs have 32 teeth.", "isTrue": false}
+]
+&lt;/script&gt;</code></pre>
+
+<p>The browser ignores a script tag with an unknown type, so this is just inert text until JavaScript reads it.</p>
+
+<h2>Step 3 &mdash; Reading the data and deriving the topics</h2>
+
+<p>Everything runs inside an IIFE so nothing leaks into the global scope. The topic list is never hard-coded &mdash; it is derived from the data, so adding a new topic to the JSON makes a new button appear on its own.</p>
+
+<pre><code>var ALL_ITEMS = JSON.parse(document.getElementById("game-data").textContent);
+var TOPICS = [];
+ALL_ITEMS.forEach(function (item) {
+  if (TOPICS.indexOf(item.topic) === -1) TOPICS.push(item.topic);
+});</code></pre>
+
+<h2>Step 4 &mdash; One object holds the whole game</h2>
+
+<p>Rather than scattering variables around, every mutable thing lives in a single <code>state</code> object. That makes the render functions easy to reason about: they only ever read from here.</p>
+
+<pre><code>var state = {
+  selectedTopics: new Set(TOPICS),
+  deck: [],
+  index: 0,
+  correct: 0,
+  wrong: 0,
+  pendingChoice: null,
+  confirmed: false
+};</code></pre>
+
+<p><code>selectedTopics</code> is a <code>Set</code> because the only operations needed are has / add / delete, and a Set gives all three for free without duplicate handling.</p>
+
+<h2>Step 5 &mdash; The topic picker</h2>
+
+<p>Each topic becomes a button with a live count badge. Clicking toggles it in the Set and re-renders. The one rule worth noting is the guard against emptying the pool: you cannot deselect your last remaining topic.</p>
+
+<pre><code>btn.addEventListener("click", function () {
+  if (state.selectedTopics.has(topic)) {
+    if (state.selectedTopics.size &gt; 1) state.selectedTopics.delete(topic);
+  } else {
+    state.selectedTopics.add(topic);
+  }
+  renderTopicGrid();
+  updatePoolCount();
+});</code></pre>
+
+<p>Selection state is stored on the DOM as <code>aria-pressed</code>, which is both the accessibility hook and the CSS hook for the highlighted style &mdash; one attribute doing two jobs.</p>
+
+<h2>Step 6 &mdash; Shuffling the deck</h2>
+
+<p>A standard Fisher-Yates shuffle, working on a copy (<code>arr.slice()</code>) so the original dataset is never reordered.</p>
+
+<pre><code>function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i &gt; 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}</code></pre>
+
+<h2>Step 7 &mdash; Starting a round</h2>
+
+<p>Filter by the selected topics, shuffle, zero the counters, swap screens, draw the first card.</p>
+
+<pre><code>function startRound() {
+  state.deck = shuffle(itemsForSelection());
+  state.index = 0;
+  state.correct = 0;
+  state.wrong = 0;
+  screenSetup.classList.add("hidden");
+  screenResults.classList.add("hidden");
+  screenPlay.classList.remove("hidden");
+  showCard();
+}</code></pre>
+
+<h2>Step 8 &mdash; Drawing a card</h2>
+
+<p><code>showCard()</code> is the reset button for a single turn. It clears the previous answer, repaints the progress bar and tallies, drops in the new statement, and disables Confirm until a choice is made.</p>
+
+<pre><code>progressBar.style.width = (state.index / state.deck.length * 100) + "%";
+cardTopic.textContent = item.topic;
+cardStatement.textContent = item.statement;
+btnConfirm.disabled = true;
+btnConfirm.textContent = "Confirm";</code></pre>
+
+<p>Note <code>textContent</code>, not <code>innerHTML</code> &mdash; statements are treated as text, never as markup.</p>
+
+<h2>Step 9 &mdash; Pick, then confirm</h2>
+
+<p>The game deliberately splits answering into two moves. Tapping True or False only records a <i>pending</i> choice; nothing is scored yet. This kills the misclick problem and makes the reveal feel like a decision rather than an accident.</p>
+
+<pre><code>function pickChoice(choice) {
+  if (state.confirmed) return;
+  state.pendingChoice = choice;
+  btnTrue.setAttribute("aria-pressed", choice === true ? "true" : "false");
+  btnFalse.setAttribute("aria-pressed", choice === false ? "true" : "false");
+  btnConfirm.disabled = false;
+}</code></pre>
+
+<h2>Step 10 &mdash; Scoring and the reveal</h2>
+
+<p>Confirming compares the pending choice against <code>isTrue</code>. Because both are real booleans, the comparison is a plain strict equality. The reveal then colours the button you picked and, if you were wrong, also lights up the one you should have picked.</p>
+
+<pre><code>var wasCorrect = state.pendingChoice === item.isTrue;
+if (wasCorrect) { state.correct++; } else { state.wrong++; }
+
+var chosenBtn = state.pendingChoice === true ? btnTrue : btnFalse;
+chosenBtn.classList.add(wasCorrect ? "reveal-correct" : "reveal-wrong");
+if (!wasCorrect) {
+  var actualBtn = item.isTrue ? btnTrue : btnFalse;
+  actualBtn.classList.add("reveal-correct");
+}</code></pre>
+
+<p>A CORRECT / INCORRECT stamp is dropped on the card, a one-line explanation is written to an <code>aria-live</code> region so screen readers announce it, and both verdict buttons are locked so the answer cannot be changed after the fact.</p>
+
+<h2>Step 11 &mdash; One button doing two jobs</h2>
+
+<p>The primary button is Confirm before you answer and Next card afterwards. Relabelling it saves a button and keeps the thumb in one place on mobile.</p>
+
+<pre><code>btnConfirm.textContent = state.index + 1 &lt; state.deck.length ? "Next card" : "See results";
+
+function advance() {
+  if (!state.confirmed) { confirmChoice(); return; }
+  state.index++;
+  if (state.index &gt;= state.deck.length) {
+    showResults();
+  } else {
+    showCard();
+  }
+}</code></pre>
+
+<h2>Step 12 &mdash; Results and ranks</h2>
+
+<p>At the end the score is turned into a percentage and mapped onto a small ladder of dog-themed ranks, each with its own closing line.</p>
+
+<pre><code>var pct = total ? Math.round((state.correct / total) * 100) : 0;
+
+if (pct === 100)      { rank = "Top Dog"; }
+else if (pct &gt;= 80)   { rank = "Good Boy"; }
+else if (pct &gt;= 60)   { rank = "Loyal Companion"; }
+else if (pct &gt;= 40)   { rank = "Still in Training"; }
+else                  { rank = "Chasing Its Tail"; }</code></pre>
+
+<p>Since the deck is 50/50 by construction, "Still in Training" at 40&ndash;59% is roughly the coin-flip band &mdash; a nice built-in sanity check.</p>
+
+<h2>Step 13 &mdash; Wiring it up</h2>
+
+<p>The last few lines attach the listeners and paint the setup screen. That is the entire bootstrap.</p>
+
+<pre><code>btnTrue.addEventListener("click", function () { pickChoice(true); });
+btnFalse.addEventListener("click", function () { pickChoice(false); });
+btnConfirm.addEventListener("click", advance);
+btnQuit.addEventListener("click", showResults);
+btnStart.addEventListener("click", startRound);
+
+renderTopicGrid();
+updatePoolCount();</code></pre>
+
+<h2>A few design choices</h2>
+
+<p>The two display fonts are embedded directly in the CSS as base64 WOFF2, so the page makes <b>zero external requests</b> and looks identical offline. Theming is done with CSS custom properties, which is what makes the light and dark variants a handful of variable swaps instead of a second stylesheet.</p>
+
+<p>Accessibility came almost for free by using the right primitives: real <code>&lt;button&gt;</code> elements (so keyboard and Enter/Space work with no extra code), <code>aria-pressed</code> for toggles, and <code>aria-live="polite"</code> on the feedback line.</p>
+
+<h2>Deployment</h2>
+
+<p>Because the game is one self-contained file, hosting is trivial: push <code>index.html</code> to the repo root and turn on GitHub Pages with <b>Deploy from a branch &rarr; main &rarr; / (root)</b>. About a minute later it is live at <a href="https://flaakira.github.io/true-or-woof/" target='_blank'>flaakira.github.io/true-or-woof</a>.</p>
+
+<h2>What I took from it</h2>
+
+<p>The interesting part was not the JavaScript, it was the data work: a public API that no longer answers, a static dataset that still does, and the realisation that a trivia game needs <i>wrong</i> answers as much as right ones. Writing 43 believable fakes turned out to be harder &mdash; and more fun &mdash; than writing the game loop.</p>
+
+<ul>
+<p>Tools &amp; Process:</p>
+<li>HTML5 &amp; CSS3 (custom properties, no framework)</li>
+<li>Vanilla JavaScript (no build step, no dependencies)</li>
+<li>Python 3 for the data-prep pipeline (urllib, json, csv)</li>
+<li>Dog Facts API static dataset (435 facts)</li>
+<li>GitHub Pages</li>
+</ul>
