@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>Pokemon Top Trumps Analysis</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);color:#333}
+.container{max-width:1400px;margin:0 auto;padding:40px 20px}
+header{background:white;border-radius:10px;padding:40px;margin-bottom:40px;box-shadow:0 10px 40px rgba(0,0,0,.1);text-align:center}
+h1{font-size:2.5em;color:#667eea;margin-bottom:10px}
+.subtitle{font-size:1.1em;color:#666;margin-bottom:20px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:15px;margin-top:20px}
+.stat-box{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:15px;border-radius:8px;text-align:center}
+.stat-value{font-size:1.8em;font-weight:bold}
+.stat-label{font-size:.85em;opacity:.9}
+.section{background:white;border-radius:10px;padding:40px;margin-bottom:40px;box-shadow:0 10px 40px rgba(0,0,0,.1)}
+h2{color:#667eea;font-size:1.8em;margin-bottom:20px;border-bottom:3px solid #667eea;padding-bottom:10px}
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(450px,1fr));gap:30px;margin-bottom:30px}
+.chart-container{background:#f8f9fa;border-radius:8px;padding:20px;height:380px}
+.insights{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:20px}
+.insight-card{background:#f5f7fa;padding:20px;border-radius:8px;border-left:5px solid #667eea}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th{background:#667eea;color:white;padding:12px;text-align:left}
+td{padding:12px;border-bottom:1px solid #eee}
+tr:hover{background:#f5f7fa}
+.tier-s{color:#ff6b6b;font-weight:bold}
+.tier-a{color:#ffa94d;font-weight:bold}
+.footer{text-align:center;color:white;padding:20px;margin-top:30px}
+li{margin-left:20px;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>🎮 Pokemon Top Trumps</h1>
+<p class="subtitle">Competitive Analysis - 10,000 Simulated Games</p>
+<div class="stats-grid">
+<div class="stat-box"><div class="stat-value">49.44%</div><div class="stat-label">Win Rate</div></div>
+<div class="stat-box"><div class="stat-value">9.51</div><div class="stat-label">Avg Rounds</div></div>
+<div class="stat-box"><div class="stat-value">151</div><div class="stat-label">Pokemon</div></div>
+<div class="stat-box"><div class="stat-value">95k+</div><div class="stat-label">Total Rounds</div></div>
+</div>
+</header>
+
+<div class="section">
+<h2>📊 Strongest vs Weakest Pokemon</h2>
+<div class="charts-grid">
+<div class="chart-container"><canvas id="topChart"></canvas></div>
+<div class="chart-container"><canvas id="bottomChart"></canvas></div>
+</div>
+</div>
+
+<div class="section">
+<h2>🎯 Type Matchup Analysis</h2>
+<div class="charts-grid">
+<div class="chart-container"><canvas id="bestChart"></canvas></div>
+<div class="chart-container"><canvas id="worstChart"></canvas></div>
+</div>
+</div>
+
+<div class="section">
+<h2>💡 Key Insights</h2>
+<div class="insights">
+<div class="insight-card">
+<h3>⚡ Mewtwo Dominance</h3>
+<p><strong>87.23% win rate</strong> - Overwhelmingly strongest card with legendary stats and Psychic typing. Having Mewtwo gives massive advantage.</p>
+</div>
+<div class="insight-card">
+<h3>🔥 Fire Type Supremacy</h3>
+<p><strong>94.55% vs Bug</strong> - Fire is the most effective type, dominating Bug and Grass matchups at 90%+ win rates.</p>
+</div>
+<div class="insight-card">
+<h3>🐛 Bug Type Weakness</h3>
+<p><strong>Only 6.49% vs Fire</strong> - Bug is weakest type. Early evolutions (Caterpie, Weedle) are severe liabilities at 6-7% win rates.</p>
+</div>
+<div class="insight-card">
+<h3>🎭 Psychic Balance</h3>
+<p><strong>82.56% vs Fighting</strong> - Excellent defensive matchups with strong cards like Mewtwo and Mew leading the meta.</p>
+</div>
+<div class="insight-card">
+<h3>🐉 Dragon Versatility</h3>
+<p><strong>83.15% vs Grass</strong> - Most consistent type across matchups. Dragonite ranks #2 overall at 85.58% win rate.</p>
+</div>
+<div class="insight-card">
+<h3>❌ Early Evolutions = Risk</h3>
+<p><strong>~11% average</strong> - Avoid Caterpie, Weedle, Kakuna, Metapod. Early stages are statistical liabilities.</p>
+</div>
+</div>
+</div>
+
+<div class="section">
+<h2>🏆 Pokemon Tier System</h2>
+<table>
+<tr><th>Tier</th><th>Win Rate</th><th>Pokemon</th><th>Strategy</th></tr>
+<tr><td><span class="tier-s">S-Tier</span></td><td>>80%</td><td>Mewtwo, Dragonite, Mew</td><td>Game-changing - always pick if available</td></tr>
+<tr><td><span class="tier-a">A-Tier</span></td><td>70-80%</td><td>Zapdos, Starmie, Moltres, Blastoise</td><td>Strong consistent performers</td></tr>
+<tr><td>B-Tier</td><td>60-70%</td><td>Articuno, Arcanine, Nidoking, Gengar</td><td>Solid with good type matchups</td></tr>
+<tr><td>C-Tier</td><td>40-60%</td><td>Most Pokemon</td><td>Average - pick based on matchups</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>📋 Strategic Recommendations</h2>
+<h3 style="color:#667eea;margin:20px 0 15px 0">Deck Building Priority:</h3>
+<ol>
+<li><strong>Secure S-Tier Legendaries:</strong> Mewtwo (87%), Dragonite (86%), Mew (82%)</li>
+<li><strong>Build Fire-Type Core:</strong> Dominates Bug/Grass matchups at 90%+</li>
+<li><strong>Include Psychic Types:</strong> Strong defensive matchups, excellent stats</li>
+<li><strong>Prioritize Dragon Types:</strong> Consistent performance across varied matchups</li>
+<li><strong>Avoid Early Evolutions:</strong> Caterpie, Weedle, Kakuna drag down average win rate</li>
+</ol>
+
+<h3 style="color:#667eea;margin:20px 0 15px 0">Type Strategy Guide:</h3>
+<table>
+<tr><th>Strategy</th><th>Primary Type</th><th>Best Matchups</th><th>Win Rate</th></tr>
+<tr><td><strong>Aggressive</strong></td><td>Fire</td><td>Bug, Grass, Fairy</td><td>90%+</td></tr>
+<tr><td><strong>Defensive</strong></td><td>Psychic</td><td>Fighting, Fairy</td><td>82%+</td></tr>
+<tr><td><strong>Balanced</strong></td><td>Dragon</td><td>Grass, Multi-type</td><td>80%+</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>🔬 Methodology</h2>
+<p>Analysis based on 10,000 simulated 6v6 Pokemon battles with:</p>
+<ul>
+<li>All 151 Generation 1 Pokemon</li>
+<li>Random selection (Fisher-Yates shuffle)</li>
+<li>Random stat selection (no strategic advantage)</li>
+<li>Full type effectiveness mechanics</li>
+<li>95,050 individual rounds played</li>
+</ul>
+<p style="margin-top:15px;color:#666;font-size:.95em"><strong>Note:</strong> Random play baseline. Skilled players with optimal strategy could reach 55-65% win rates.</p>
+</div>
+
+<footer class="footer">
+<p>Analysis generated: August 21, 2026</p>
+<p style="margin-top:10px;font-size:.9em">📊 Data analysis • 🎮 Pokemon strategy • 💻 Interactive visualization</p>
+</footer>
+</div>
+
+<script>
+// Top 10 Strongest Pokemon
+const topCtx = document.getElementById('topChart').getContext('2d');
+new Chart(topCtx, {
+type:'bar',
+data:{
+labels:['Mewtwo','Dragonite','Mew','Zapdos','Starmie','Moltres','Blastoise','Articuno','Arcanine','Nidoking'],
+datasets:[{label:'Win Rate %',data:[87.23,85.58,81.85,77.94,73.58,71.39,71.10,68.93,68.55,68.30],backgroundColor:['#ff6b6b','#ff8787','#ff9999','#ffa94d','#ffbb78','#ffc078','#ffb366','#74c0fc','#91caff','#a5d8ff'],borderRadius:5}]
+},
+options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}
+});
+
+// Bottom 10 Weakest
+const botCtx = document.getElementById('bottomChart').getContext('2d');
+new Chart(botCtx, {
+type:'bar',
+data:{
+labels:['Caterpie','Jigglypuff','Weedle','Kakuna','Metapod','Zubat','Pidgey','Spearow','Nidoran-f','Magikarp'],
+datasets:[{label:'Win Rate %',data:[6.23,6.39,7.09,7.99,8.76,12.32,14.44,15.20,17.28,17.31],backgroundColor:'#e9ecef',borderColor:'#adb5bd',borderWidth:1,borderRadius:5}]
+},
+options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:20,ticks:{callback:v=>v+'%'}}}}
+});
+
+// Best Matchups
+const bestCtx = document.getElementById('bestChart').getContext('2d');
+new Chart(bestCtx, {
+type:'bar',
+data:{
+labels:['Fire vs Bug','Fire vs Grass','Fire vs Fairy','Ice vs Dragon','Poison vs Fairy','Dragon vs Grass','Psychic vs Fighting','Ice vs Ground','Psychic vs Fairy','Ice vs Grass'],
+datasets:[{label:'Win Rate %',data:[94.55,91.13,89.66,85.71,84.31,83.15,82.56,81.52,81.43,81.16],backgroundColor:'rgba(102,126,234,0.8)',borderColor:'#667eea',borderWidth:2,borderRadius:5}]
+},
+options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}
+});
+
+// Worst Matchups
+const worstCtx = document.getElementById('worstChart').getContext('2d');
+new Chart(worstCtx, {
+type:'bar',
+data:{
+labels:['Fairy vs Ice','Bug vs Fire','Grass vs Fire','Fairy vs Fire','Ice vs Fire','Fairy vs Poison','Bug vs Ice','Poison vs Ice','Water vs Grass','Grass vs Ice'],
+datasets:[{label:'Win Rate %',data:[4.00,6.49,8.81,12.22,17.65,17.74,17.86,17.97,18.16,19.08],backgroundColor:'rgba(233,236,239,0.8)',borderColor:'#adb5bd',borderWidth:2,borderRadius:5}]
+},
+options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:25,ticks:{callback:v=>v+'%'}}}}
+});
+</script>
+</body>
+</html>
