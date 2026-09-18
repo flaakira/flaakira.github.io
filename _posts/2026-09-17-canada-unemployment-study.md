@@ -4,7 +4,11 @@ title: "Canada's Unemployment Crisis & Opportunity: A Comprehensive 2022-2026 St
 subtitle: "Interactive data visualization of employment trends, regional disparities, and 2027 projections"
 date: 2026-09-17
 background: '/img/posts/canada-employment.jpg'
-categories: [economics, data-analysis, employment, canada]
+categories:
+  - economics
+  - data-analysis
+  - employment
+  - canada
 ---
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -320,52 +324,3 @@ const projectionChart = new Chart(ctx7, {
             },
             legend: {
                 display: true,
-                position: 'bottom'
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: false,
-                min: 6.0,
-                max: 7.0,
-                title: {
-                    display: true,
-                    text: 'Unemployment Rate (%)'
-                }
-            }
-        }
-    }
-});
-</script>
-
-2027 Forecast:
-- Most Likely: 6.4% - 6.5% (Vanguard & TD Economics consensus)
-- Confidence: High
-- Trend: Stabilization expected
-
----
-
-## Data Sources
-
-Official Sources:
-- Statistics Canada Labour Force Survey (August 2026, released September 4, 2026)
-  - Table: 14-10-0355-01 (Employment by Industry)
-  - https://www.statcan.gc.ca/
-
-- Economic Forecasts
-  - Vanguard Corporate: https://corporate.vanguard.com/vemo/vemo-canada
-  - TD Economics: https://economics.td.com/ca-quarter-economic-forecast
-
----
-
-## Conclusion
-
-Canada's employment picture is stabilizing after 2024-2025 volatility. While national unemployment has improved to 6.4%, the recovery is uneven—concentrated in healthcare and manufacturing, while retail faces structural headwinds.
-
-Regional disparities (5.6% in Quebec vs. 8.6% in Newfoundland & Labrador) suggest economic opportunities remain concentrated. Most concerning is youth unemployment at 12.9%, requiring targeted policy attention.
-
-For 2027: Expect stability around 6.4-6.5% with modest improvement possible.
-
----
-
-Published: September 17, 2026 | Data as of: August 2026 | Charts powered by Chart.js
