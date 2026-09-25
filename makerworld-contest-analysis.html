@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MakerWorld Contest Theme Study</title>
+<meta name="description" content="Theme and category demand study of 158 MakerWorld 3D design contests: best and worst contests, category tiers and recommendations.">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);color:#333;line-height:1.5}
+.container{max-width:1400px;margin:0 auto;padding:40px 20px}
+header{background:#fff;border-radius:10px;padding:40px;margin-bottom:40px;box-shadow:0 10px 40px rgba(0,0,0,.1);text-align:center}
+h1{font-size:2.5em;color:#667eea;margin-bottom:10px}
+.subtitle{font-size:1.1em;color:#666;margin-bottom:20px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin-top:20px}
+.stat-box{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px;border-radius:8px;text-align:center}
+.stat-value{font-size:1.8em;font-weight:bold}
+.stat-label{font-size:.85em;opacity:.9}
+.section{background:#fff;border-radius:10px;padding:40px;margin-bottom:40px;box-shadow:0 10px 40px rgba(0,0,0,.1)}
+h2{color:#667eea;font-size:1.8em;margin-bottom:20px;border-bottom:3px solid #667eea;padding-bottom:10px}
+h3{color:#764ba2;margin:10px 0}
+p.lead{color:#555;margin-bottom:20px}
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:30px}
+.chart-box{background:#f8f9fa;border-radius:8px;padding:20px;position:relative;height:440px}
+.chart-box.tall{height:520px}
+.chart-title{font-weight:600;color:#444;margin-bottom:8px;font-size:.95em}
+.chart-wrap{position:relative;height:calc(100% - 30px)}
+.insights{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:20px}
+.insight{border-left:5px solid #667eea;background:#f8f9fa;padding:20px;border-radius:8px}
+.insight h3{margin-top:0}
+.insight .big{font-weight:700;color:#667eea}
+.insight.bad{border-color:#ff6b6b}.insight.bad .big{color:#e03131}
+.insight.good{border-color:#20c997}.insight.good .big{color:#0ca678}
+.insight.warn{border-color:#ffa94d}.insight.warn .big{color:#e8590c}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.95em}
+th{background:#667eea;color:#fff;text-align:left;padding:12px}
+td{padding:10px 12px;border-bottom:1px solid #eee;vertical-align:top}
+tr:hover td{background:#f5f3ff}
+.tier{display:inline-block;width:34px;text-align:center;border-radius:6px;font-weight:700;color:#fff;padding:2px 0}
+.S{background:#e03131}.A{background:#f08c00}.B{background:#1c7ed6}.C{background:#868e96}
+.tabs{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+.tabs button{border:2px solid #667eea;background:#fff;color:#667eea;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:600}
+.tabs button.active{background:#667eea;color:#fff}
+ol,ul{margin-left:22px}
+li{margin-bottom:8px}
+.links{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+.links a{background:#fff;border:2px solid #667eea;color:#667eea;padding:8px 18px;border-radius:20px;text-decoration:none;font-weight:600}
+.links a:hover{background:#667eea;color:#fff}
+.note{font-size:.9em;color:#777;margin-top:12px}
+footer{text-align:center;color:#fff;opacity:.9;padding:10px}
+@media(max-width:600px){.container{padding:16px}header,.section{padding:22px}h1{font-size:1.8em}h2{font-size:1.4em}.chart-box{height:400px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🏆 MakerWorld Contest Theme Study</h1>
+  <div class="subtitle">Theme &amp; Category Demand Analysis · 158 design contests · Oct 2023 – Sep 2026</div>
+  <div class="stats-grid" id="kpis"></div>
+  <div class="links">
+    <a href="https://github.com/flaakira/makerworld-contest-analysis/blob/main/makerworld_contest_analysis.ipynb" target="_blank">📓 Python Notebook</a>
+    <a href="https://github.com/flaakira/makerworld-contest-analysis/blob/main/data/contests_scored.csv" target="_blank">🗂️ Dataset (CSV)</a>
+    <a href="https://makerworld.com/en/contests" target="_blank">🌐 Data source</a>
+  </div>
+</header>
+
+<section class="section">
+  <h2>🎯 Business Question</h2>
+  <p class="lead">MakerWorld runs a new 3D design contest almost every week. <b>Which themes attract the most makers and the most attention, and which contests were the best and worst performers?</b> This study scores every finished contest, groups them into six theme categories and turns the patterns into recommendations for planning the next contest calendar.</p>
+</section>
+
+<section class="section">
+  <h2>📊 Best vs Worst Contests</h2>
+  <p class="lead">Composite Performance Score (0–100) = 40% participants + 30% models submitted per day + 30% views, each converted to a percentile rank across the <span id="nfin"></span> finished contests.</p>
+  <div class="charts-grid">
+    <div class="chart-box tall"><div class="chart-title">🟢 Top 10 contests</div><div class="chart-wrap"><canvas id="bestChart"></canvas></div></div>
+    <div class="chart-box tall"><div class="chart-title">🔴 Bottom 10 contests</div><div class="chart-wrap"><canvas id="worstChart"></canvas></div></div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>🧩 Category Performance</h2>
+  <p class="lead">Every contest was classified into one of six theme categories. Holidays dominate; Engineering &amp; Tech brings in viewers but few entries.</p>
+  <div class="charts-grid">
+    <div class="chart-box"><div class="chart-title">Average composite score by category</div><div class="chart-wrap"><canvas id="catScore"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Tier mix by category (number of contests)</div><div class="chart-wrap"><canvas id="catTier"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Reach vs participation (median per category, bubble = # contests)</div><div class="chart-wrap"><canvas id="matrix"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Share of all submitted models</div><div class="chart-wrap"><canvas id="share"></canvas></div></div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>🏅 Best &amp; Worst Contest per Category</h2>
+  <div class="table-wrap"><table id="catTable"></table></div>
+</section>
+
+<section class="section">
+  <h2>📅 Seasonality, Host &amp; Trend</h2>
+  <div class="charts-grid">
+    <div class="chart-box"><div class="chart-title">Median participants by start month</div><div class="chart-wrap"><canvas id="month"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Host type: median participants vs median views</div><div class="chart-wrap"><canvas id="host"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Regular contests: holiday season vs rest of year</div><div class="chart-wrap"><canvas id="cannibal"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Contests per year and median participants</div><div class="chart-wrap"><canvas id="year"></canvas></div></div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>💡 Key Insights</h2>
+  <div class="insights" id="insights"></div>
+</section>
+
+<section class="section">
+  <h2>🏆 Contest Tier System</h2>
+  <div class="tabs" id="tierTabs"></div>
+  <div class="table-wrap"><table id="tierTable"></table></div>
+</section>
+
+<section class="section">
+  <h2>📋 Strategic Recommendations</h2>
+  <h3>Contest calendar priorities</h3>
+  <ol id="recs"></ol>
+  <h3 style="margin-top:25px">Theme strategy guide</h3>
+  <div class="table-wrap"><table id="strategy"></table></div>
+</section>
+
+<section class="section">
+  <h2>🔬 Methodology</h2>
+  <ul>
+    <li><b>Data collection:</b> public MakerWorld contests page (all 158 contest cards) plus each contest's detail page (prize list and winners), collected on <b>25 Sep 2026</b> with a small JavaScript script in the browser.</li>
+    <li><b>Metrics:</b> models submitted, participants and views as shown on each contest card. Participants are counted per contest, so one maker who joins several contests is counted several times.</li>
+    <li><b>Scope:</b> <span id="nfin2"></span> finished contests are scored. The 8 contests still running on the snapshot date are shown in the dataset but not ranked.</li>
+    <li><b>Composite score:</b> percentile rank of participants (40%), models per day (30%) and views (30%). Tiers: S = top 10%, A = next 20%, B = middle 40%, C = bottom 30%.</li>
+    <li><b>Categories:</b> assigned by hand from each contest's theme brief (6 categories). Brand-sponsored contests are flagged separately.</li>
+    <li><b>Holiday mega-contests:</b> Halloween, Christmas/Printmas, Valentine's and Easter editions (<span id="nhol"></span> contests).</li>
+  </ul>
+  <p class="note"><b>Limitations:</b> views keep growing after a contest ends, so older contests have a small advantage (Spearman correlation between views and contest age = <span id="vage"></span>). Prize values count only USD gift cards and cash, not printers or points. Categories involve judgment and can be reclassified in the notebook.</p>
+  <p class="note">Analysis generated: September 25, 2026 · Flavio Akira Tikaishi</p>
+</section>
+
+<footer>📊 Business analysis • 🧩 Theme strategy • 💻 Interactive visualization</footer>
+</div>
+
+<script>
+const R = {
+ "kpis": {
+  "contests": 158,
+  "finished": 150,
+  "models": 131899,
+  "participants": 96198,
+  "views": 43692700
+ },
+ "tier_cutoffs": {
+  "0.3": 33.7,
+  "0.7": 64.8,
+  "0.9": 84.0
+ },
+ "category": [
+  {
+   "category": "Seasonal & Holidays",
+   "contests": 22,
+   "total_models": 51539,
+   "median_models": 1379.5,
+   "median_participants": 949.0,
+   "median_views": 294971.0,
+   "median_models_per_day": 62.2,
+   "avg_score": 70.1,
+   "s_or_a": 63.6,
+   "winner_likes_per_winner": 1433.1,
+   "share_of_models_%": 39.6
+  },
+  {
+   "category": "Education & Social Good",
+   "contests": 8,
+   "total_models": 6249,
+   "median_models": 683.0,
+   "median_participants": 551.5,
+   "median_views": 315206.0,
+   "median_models_per_day": 27.4,
+   "avg_score": 60.6,
+   "s_or_a": 37.5,
+   "winner_likes_per_winner": 1206.4,
+   "share_of_models_%": 4.8
+  },
+  {
+   "category": "Home & Functional",
+   "contests": 40,
+   "total_models": 28503,
+   "median_models": 624.0,
+   "median_participants": 538.5,
+   "median_views": 286135.5,
+   "median_models_per_day": 26.0,
+   "avg_score": 55.6,
+   "s_or_a": 42.5,
+   "winner_likes_per_winner": 1790.0,
+   "share_of_models_%": 21.9
+  },
+  {
+   "category": "Toys & Games",
+   "contests": 23,
+   "total_models": 15072,
+   "median_models": 499.0,
+   "median_participants": 464.0,
+   "median_views": 288294.0,
+   "median_models_per_day": 21.4,
+   "avg_score": 47.0,
+   "s_or_a": 21.7,
+   "winner_likes_per_winner": 2329.2,
+   "share_of_models_%": 11.6
+  },
+  {
+   "category": "Art, D\u00e9cor & Fashion",
+   "contests": 28,
+   "total_models": 18213,
+   "median_models": 562.0,
+   "median_participants": 411.5,
+   "median_views": 223661.0,
+   "median_models_per_day": 17.9,
+   "avg_score": 44.8,
+   "s_or_a": 14.3,
+   "winner_likes_per_winner": 1301.8,
+   "share_of_models_%": 14.0
+  },
+  {
+   "category": "Engineering & Tech",
+   "contests": 29,
+   "total_models": 10448,
+   "median_models": 243.0,
+   "median_participants": 288.0,
+   "median_views": 296237.0,
+   "median_models_per_day": 7.7,
+   "avg_score": 33.1,
+   "s_or_a": 6.9,
+   "winner_likes_per_winner": 1539.5,
+   "share_of_models_%": 8.0
+  }
+ ],
+ "host": [
+  {
+   "host_type": "Official",
+   "contests": 121,
+   "median_models": 601.0,
+   "median_participants": 526.0,
+   "median_views": 283186.0,
+   "median_duration": 25.0,
+   "avg_score": 53.9
+  },
+  {
+   "host_type": "Master Challenge",
+   "contests": 14,
+   "median_models": 325.0,
+   "median_participants": 309.5,
+   "median_views": 300128.5,
+   "median_duration": 33.5,
+   "avg_score": 36.6
+  },
+  {
+   "host_type": "Creator-hosted",
+   "contests": 15,
+   "median_models": 570.0,
+   "median_participants": 408.0,
+   "median_views": 158618.0,
+   "median_duration": 34.0,
+   "avg_score": 34.6
+  }
+ ],
+ "best": [
+  {
+   "contest_name": "Cozy Christmas",
+   "category": "Seasonal & Holidays",
+   "host_type": "Official",
+   "models": 6254,
+   "participants": 3362,
+   "views": 672259,
+   "models_per_day": 271.9,
+   "score": 99.5,
+   "tier": "S",
+   "first_prize_title": "Animated Winter Wonderland",
+   "first_prize_creator": "chiz_m"
+  },
+  {
+   "contest_name": "Printmas 2025",
+   "category": "Seasonal & Holidays",
+   "host_type": "Official",
+   "models": 7078,
+   "participants": 3634,
+   "views": 636726,
+   "models_per_day": 228.3,
+   "score": 99.2,
+   "tier": "S",
+   "first_prize_title": "Winter Village - Sled Hill Diorama",
+   "first_prize_creator": "Structales - Roadrunner4d"
+  },
+  {
+   "contest_name": "Halloween 2025",
+   "category": "Seasonal & Holidays",
+   "host_type": "Official",
+   "models": 5738,
+   "participants": 3047,
+   "views": 728215,
+   "models_per_day": 212.5,
+   "score": 99.1,
+   "tier": "S",
+   "first_prize_title": "Haunted House - A Halloween Scene",
+   "first_prize_creator": "Structales - Roadrunner4d"
+  },
+  {
+   "contest_name": "2025 Valentine's Day",
+   "category": "Seasonal & Holidays",
+   "host_type": "Official",
+   "models": 4563,
+   "participants": 2965,
+   "views": 580305,
+   "models_per_day": 169.0,
+   "score": 97.6,
+   "tier": "S",
+   "first_prize_title": "Valentine's Day Candle-Making Set",
+   "first_prize_creator": "The Chaos Lab"
+  },
+  {
+   "contest_name": "Halloween 2024",
+   "category": "Seasonal & Holidays",
+   "host_type": "Official",
+   "models": 3656,
+   "participants": 2122,
+   "views": 662455,
+   "models_per_day": 81.2,
+   "score": 96.7,
+   "tier": "S",
+   "first_prize_title": "Haunted Halloween Carousel",
+   "first_prize_creator": "xxhouse"
+  },
+  {
+   "contest_name": "Eggs, but not just Eggs (Easter)",
+   "category": "Seasonal & Holidays",
+   "host_type": "Official",
+   "models": 3199,
+   "participants": 2073,
+   "views": 396864,
+   "models_per_day": 103.2,
+   "score": 92.9,
+   "tier": "S",
+   "first_prize_title": "Easter Bunny Egg House & Candy Jar",
+   "first_prize_creator": "Johnny_Bit"
+  },
+  {
+   "contest_name": "Gardening Tool",
+   "category": "Home & Functional",
+   "host_type": "Official",
+   "models": 1775,
+   "participants": 1275,
+   "views": 462325,
+   "models_per_day": 63.4,
+   "score": 92.5,
+   "tier": "S",
+   "first_prize_title": "RainReserve - Downspout Diversion Sy",
+   "first_prize_creator": "vaughn.taylor"
+  },
+  {
+   "contest_name": "3DBenchy 10th Anniversary",
+   "category": "Engineering & Tech",
+   "host_type": "Official",
+   "models": 1986,
+   "participants": 1575,
+   "views": 455830,
+   "models_per_day": 60.2,
+   "score": 92.2,
+   "tier": "S",
+   "first_prize_title": "Pirate Benchy - Remote Control",
+   "first_prize_creator": "Carmelart_"
+  },
+  {
+   "contest_name": "Layered with Love: 2026 Valentine's Day",
+   "category": "Seasonal & Holidays",
+   "host_type": "Official",
+   "models": 4432,
+   "participants": 2769,
+   "views": 354838,
+   "models_per_day": 130.4,
+   "score": 91.1,
+   "tier": "S",
+   "first_prize_title": "Museum of Us",
+   "first_prize_creator": "Taposk"
+  },
+  {
+   "contest_name": "Children's Toy",
+   "category": "Toys & Games",
+   "host_type": "Official",
+   "models": 3363,
+   "participants": 1756,
+   "views": 371590,
+   "models_per_day": 86.2,
+   "score": 90.5,
+   "tier": "S",
+   "first_prize_title": "Birthday Cake Set with LED Candles",
+   "first_prize_creator": "3DPmom"
+  }
+ ],
+ "worst": [
+  {
+   "contest_name": "Automobile",
+   "category": "Engineering & Tech",
+   "host_type": "Official",
+   "models": 42,
+   "participants": 40,
+   "views": 95521,
+   "models_per_day": 1.5,
+   "score": 1.0,
+   "tier": "C"
+  },
+  {
+   "contest_name": "@Bavaria_3D Tanks T-34 Evolution Remix",
+   "category": "Engineering & Tech",
+   "host_type": "Creator-hosted",
+   "models": 66,
+   "participants": 49,
+   "views": 97063,
+   "models_per_day": 1.4,
+   "score": 1.1,
+   "tier": "C"
+  },
+  {
+   "contest_name": "@wuguigui CyberBrick RC Cars Remix",
+   "category": "Engineering & Tech",
+   "host_type": "Creator-hosted",
+   "models": 84,
+   "participants": 106,
+   "views": 113333,
+   "models_per_day": 2.0,
+   "score": 3.6,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Boxes/Containers",
+   "category": "Home & Functional",
+   "host_type": "Official",
+   "models": 115,
+   "participants": 95,
+   "views": 146763,
+   "models_per_day": 4.4,
+   "score": 5.7,
+   "tier": "C"
+  },
+  {
+   "contest_name": "@Kit Crafters Mecha Remix",
+   "category": "Engineering & Tech",
+   "host_type": "Creator-hosted",
+   "models": 139,
+   "participants": 155,
+   "views": 151826,
+   "models_per_day": 3.8,
+   "score": 6.8,
+   "tier": "C"
+  },
+  {
+   "contest_name": "@Ozarkexpeditions - PlayGrid Board Games",
+   "category": "Toys & Games",
+   "host_type": "Creator-hosted",
+   "models": 162,
+   "participants": 165,
+   "views": 166192,
+   "models_per_day": 4.5,
+   "score": 9.8,
+   "tier": "C"
+  },
+  {
+   "contest_name": "CyberBrick Master: Compatible Remotes",
+   "category": "Engineering & Tech",
+   "host_type": "Master Challenge",
+   "models": 72,
+   "participants": 72,
+   "views": 199653,
+   "models_per_day": 2.1,
+   "score": 10.2,
+   "tier": "C"
+  },
+  {
+   "contest_name": "@MeshBear - Exoskeleton & Articulated Mechanism",
+   "category": "Engineering & Tech",
+   "host_type": "Creator-hosted",
+   "models": 234,
+   "participants": 240,
+   "views": 155239,
+   "models_per_day": 5.6,
+   "score": 11.8,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Music Box",
+   "category": "Toys & Games",
+   "host_type": "Official",
+   "models": 95,
+   "participants": 173,
+   "views": 210129,
+   "models_per_day": 4.0,
+   "score": 13.6,
+   "tier": "C"
+  },
+  {
+   "contest_name": "MakerWorld x Insta360 Luna Ultra",
+   "category": "Engineering & Tech",
+   "host_type": "Official",
+   "models": 234,
+   "participants": 192,
+   "views": 173303,
+   "models_per_day": 7.5,
+   "score": 13.7,
+   "tier": "C"
+  }
+ ],
+ "monthly": {
+  "1": 671.0,
+  "2": 526.0,
+  "3": 525.0,
+  "4": 550.0,
+  "5": 528.0,
+  "6": 465.0,
+  "7": 496.0,
+  "8": 600.0,
+  "9": 349.5,
+  "10": 410.5,
+  "11": 368.0,
+  "12": 369.0
+ },
+ "yearly": [
+  {
+   "year": 2023,
+   "contests": 9,
+   "median_participants": 404.0,
+   "median_views": 189592.0,
+   "creator_hosted": 0
+  },
+  {
+   "year": 2024,
+   "contests": 54,
+   "median_participants": 531.0,
+   "median_views": 291545.0,
+   "creator_hosted": 0
+  },
+  {
+   "year": 2025,
+   "contests": 55,
+   "median_participants": 455.0,
+   "median_views": 323424.0,
+   "creator_hosted": 1
+  },
+  {
+   "year": 2026,
+   "contests": 32,
+   "median_participants": 523.5,
+   "median_views": 196577.5,
+   "creator_hosted": 14
+  }
+ ],
+ "holiday": {
+  "lift": 4.4,
+  "share_models": 33.7,
+  "n": 12,
+  "mega_median": 2098.0
+ },
+ "cannibal": {
+  "in_season": 347.0,
+  "off_season": 526.0,
+  "n_in": 39
+ },
+ "brand": {
+  "sponsored": 285.0,
+  "not": 523.0,
+  "sponsored_score": 30.8,
+  "not_score": 52.0,
+  "n": 9
+ },
+ "prize_corr": -0.18,
+ "views_age_corr": 0.15,
+ "scatter": [
+  {
+   "contest_name": "Halloween",
+   "category": "Seasonal & Holidays",
+   "views": 162327,
+   "participants": 453,
+   "score": 45.0,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Fidget Toys",
+   "category": "Toys & Games",
+   "views": 396362,
+   "participants": 286,
+   "score": 45.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Christmas Decoration",
+   "category": "Seasonal & Holidays",
+   "views": 238277,
+   "participants": 681,
+   "score": 69.3,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Make My Sign",
+   "category": "Home & Functional",
+   "views": 141111,
+   "participants": 469,
+   "score": 44.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Flying Objects",
+   "category": "Toys & Games",
+   "views": 206655,
+   "participants": 212,
+   "score": 20.1,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Party Ware",
+   "category": "Home & Functional",
+   "views": 113934,
+   "participants": 332,
+   "score": 31.4,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Print Kitchen",
+   "category": "Home & Functional",
+   "views": 284997,
+   "participants": 566,
+   "score": 67.2,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Trophy Design",
+   "category": "Toys & Games",
+   "views": 141803,
+   "participants": 404,
+   "score": 32.3,
+   "tier": "C"
+  },
+  {
+   "contest_name": "2024 Calendar",
+   "category": "Seasonal & Holidays",
+   "views": 189592,
+   "participants": 209,
+   "score": 16.6,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Year of the Dragon",
+   "category": "Seasonal & Holidays",
+   "views": 197765,
+   "participants": 534,
+   "score": 49.9,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Office Helper",
+   "category": "Home & Functional",
+   "views": 307780,
+   "participants": 838,
+   "score": 80.6,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Valentine's Day",
+   "category": "Seasonal & Holidays",
+   "views": 228941,
+   "participants": 937,
+   "score": 72.9,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Let there be Light",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 239678,
+   "participants": 538,
+   "score": 57.1,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Pills Organizer",
+   "category": "Home & Functional",
+   "views": 287274,
+   "participants": 438,
+   "score": 46.3,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Kit Card",
+   "category": "Toys & Games",
+   "views": 294796,
+   "participants": 693,
+   "score": 68.0,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Landmark Inspired",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 224670,
+   "participants": 594,
+   "score": 54.8,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Easter",
+   "category": "Seasonal & Holidays",
+   "views": 211702,
+   "participants": 1025,
+   "score": 73.1,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Bathroom Accessories",
+   "category": "Home & Functional",
+   "views": 282510,
+   "participants": 1070,
+   "score": 78.8,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Floral Spring",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 187192,
+   "participants": 772,
+   "score": 63.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Filament Purge",
+   "category": "Home & Functional",
+   "views": 248940,
+   "participants": 310,
+   "score": 28.1,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Car Cabin Gadgets",
+   "category": "Home & Functional",
+   "views": 404082,
+   "participants": 616,
+   "score": 72.7,
+   "tier": "A"
+  },
+  {
+   "contest_name": "0.2mm Nozzle",
+   "category": "Engineering & Tech",
+   "views": 308267,
+   "participants": 523,
+   "score": 52.9,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Mother's Day Design Festival",
+   "category": "Seasonal & Holidays",
+   "views": 183843,
+   "participants": 482,
+   "score": 47.1,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Animal Frenzy",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 258711,
+   "participants": 550,
+   "score": 61.1,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Wireless Mouse",
+   "category": "Engineering & Tech",
+   "views": 343658,
+   "participants": 130,
+   "score": 24.9,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Fishing Gear",
+   "category": "Home & Functional",
+   "views": 183259,
+   "participants": 337,
+   "score": 29.3,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Master: OpenSCAD",
+   "category": "Engineering & Tech",
+   "views": 404229,
+   "participants": 628,
+   "score": 64.9,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Beach & Pool Essentials",
+   "category": "Home & Functional",
+   "views": 213158,
+   "participants": 466,
+   "score": 44.4,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Wedding Decor",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 130120,
+   "participants": 397,
+   "score": 30.1,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Wizarding Universe",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 222652,
+   "participants": 415,
+   "score": 42.3,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Beauty of Mathematics",
+   "category": "Education & Social Good",
+   "views": 304214,
+   "participants": 546,
+   "score": 62.0,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Games of the 80s",
+   "category": "Toys & Games",
+   "views": 248429,
+   "participants": 464,
+   "score": 52.9,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Shoe Charms",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 146225,
+   "participants": 340,
+   "score": 26.9,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Celebrate Sports",
+   "category": "Engineering & Tech",
+   "views": 147066,
+   "participants": 483,
+   "score": 39.1,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Sandbox Games",
+   "category": "Toys & Games",
+   "views": 233336,
+   "participants": 441,
+   "score": 43.7,
+   "tier": "B"
+  },
+  {
+   "contest_name": "CMF by Nothing Phone 1",
+   "category": "Engineering & Tech",
+   "views": 304307,
+   "participants": 509,
+   "score": 53.3,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Fridge Magnets",
+   "category": "Home & Functional",
+   "views": 229582,
+   "participants": 876,
+   "score": 70.7,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Biological Models",
+   "category": "Education & Social Good",
+   "views": 190079,
+   "participants": 283,
+   "score": 21.9,
+   "tier": "C"
+  },
+  {
+   "contest_name": "School Supplies",
+   "category": "Home & Functional",
+   "views": 337150,
+   "participants": 928,
+   "score": 81.7,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Model Cars",
+   "category": "Engineering & Tech",
+   "views": 304884,
+   "participants": 327,
+   "score": 35.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Pet Supplies",
+   "category": "Home & Functional",
+   "views": 267398,
+   "participants": 528,
+   "score": 55.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Games of the 90s",
+   "category": "Toys & Games",
+   "views": 288294,
+   "participants": 608,
+   "score": 67.6,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Hangers",
+   "category": "Home & Functional",
+   "views": 356726,
+   "participants": 1000,
+   "score": 84.1,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Puzzles & Brain Teasers",
+   "category": "Toys & Games",
+   "views": 299724,
+   "participants": 477,
+   "score": 51.4,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Halloween 2024",
+   "category": "Seasonal & Holidays",
+   "views": 662455,
+   "participants": 2122,
+   "score": 96.7,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Magnificent Hometown",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 141855,
+   "participants": 331,
+   "score": 22.3,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Wireless Head/Earphone Accessories",
+   "category": "Home & Functional",
+   "views": 256163,
+   "participants": 368,
+   "score": 37.6,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Modern Armaments: Tanks",
+   "category": "Engineering & Tech",
+   "views": 189232,
+   "participants": 251,
+   "score": 18.1,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Master: Engines",
+   "category": "Engineering & Tech",
+   "views": 382757,
+   "participants": 266,
+   "score": 34.2,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Travel Essentials",
+   "category": "Home & Functional",
+   "views": 384276,
+   "participants": 1007,
+   "score": 86.5,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Masks",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 486827,
+   "participants": 368,
+   "score": 52.0,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Board Games",
+   "category": "Toys & Games",
+   "views": 578090,
+   "participants": 916,
+   "score": 87.8,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Space Explorations",
+   "category": "Education & Social Good",
+   "views": 388988,
+   "participants": 776,
+   "score": 76.6,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Trip to North Pole",
+   "category": "Seasonal & Holidays",
+   "views": 309073,
+   "participants": 1045,
+   "score": 82.7,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Castles",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 283186,
+   "participants": 347,
+   "score": 34.0,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Cozy Christmas",
+   "category": "Seasonal & Holidays",
+   "views": 672259,
+   "participants": 3362,
+   "score": 99.5,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Master: Mecha",
+   "category": "Engineering & Tech",
+   "views": 304020,
+   "participants": 288,
+   "score": 32.8,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Coffee Station",
+   "category": "Home & Functional",
+   "views": 324014,
+   "participants": 577,
+   "score": 70.5,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Clocks",
+   "category": "Home & Functional",
+   "views": 432622,
+   "participants": 564,
+   "score": 74.5,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Maker's Beginner Kit",
+   "category": "Toys & Games",
+   "views": 338922,
+   "participants": 649,
+   "score": 66.5,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Master: Marble Run",
+   "category": "Engineering & Tech",
+   "views": 390712,
+   "participants": 185,
+   "score": 33.7,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Physics Education",
+   "category": "Education & Social Good",
+   "views": 626463,
+   "participants": 689,
+   "score": 80.5,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Vaults",
+   "category": "Home & Functional",
+   "views": 421004,
+   "participants": 369,
+   "score": 49.9,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Year of the Snake",
+   "category": "Seasonal & Holidays",
+   "views": 311547,
+   "participants": 804,
+   "score": 76.3,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Fighter Jets",
+   "category": "Engineering & Tech",
+   "views": 407162,
+   "participants": 515,
+   "score": 61.7,
+   "tier": "B"
+  },
+  {
+   "contest_name": "2025 Valentine's Day",
+   "category": "Seasonal & Holidays",
+   "views": 580305,
+   "participants": 2965,
+   "score": 97.6,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Shoe Racks",
+   "category": "Home & Functional",
+   "views": 485616,
+   "participants": 404,
+   "score": 52.9,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Master: Toy Train Track Sets",
+   "category": "Engineering & Tech",
+   "views": 363378,
+   "participants": 318,
+   "score": 41.9,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Monitor Risers",
+   "category": "Home & Functional",
+   "views": 499988,
+   "participants": 730,
+   "score": 81.3,
+   "tier": "A"
+  },
+  {
+   "contest_name": "MakerWorld x Corcelain",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 224843,
+   "participants": 380,
+   "score": 33.6,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Geology/Geography Studies",
+   "category": "Education & Social Good",
+   "views": 349239,
+   "participants": 526,
+   "score": 63.1,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Becoming A Hunter",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 393028,
+   "participants": 837,
+   "score": 84.0,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Master: Musical Instruments",
+   "category": "Engineering & Tech",
+   "views": 359160,
+   "participants": 526,
+   "score": 62.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Cities of the Future",
+   "category": "Education & Social Good",
+   "views": 324459,
+   "participants": 355,
+   "score": 41.3,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Reusing Cardboard Spools",
+   "category": "Home & Functional",
+   "views": 344603,
+   "participants": 498,
+   "score": 56.0,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Eggs, but not just Eggs (Easter)",
+   "category": "Seasonal & Holidays",
+   "views": 396864,
+   "participants": 2073,
+   "score": 92.9,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Music Box",
+   "category": "Toys & Games",
+   "views": 210129,
+   "participants": 173,
+   "score": 13.6,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Portable Chair",
+   "category": "Home & Functional",
+   "views": 348837,
+   "participants": 255,
+   "score": 33.9,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Mini Casino",
+   "category": "Toys & Games",
+   "views": 351811,
+   "participants": 430,
+   "score": 53.0,
+   "tier": "B"
+  },
+  {
+   "contest_name": "3DBenchy 10th Anniversary",
+   "category": "Engineering & Tech",
+   "views": 455830,
+   "participants": 1575,
+   "score": 92.2,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Hiking",
+   "category": "Home & Functional",
+   "views": 459518,
+   "participants": 727,
+   "score": 80.9,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Gardening Tool",
+   "category": "Home & Functional",
+   "views": 462325,
+   "participants": 1275,
+   "score": 92.5,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Water Spray",
+   "category": "Toys & Games",
+   "views": 382823,
+   "participants": 235,
+   "score": 33.7,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Magic Trick",
+   "category": "Toys & Games",
+   "views": 311193,
+   "participants": 287,
+   "score": 34.9,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Crown",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 181268,
+   "participants": 637,
+   "score": 55.4,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Coffee Goes Places",
+   "category": "Home & Functional",
+   "views": 347567,
+   "participants": 528,
+   "score": 58.3,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Boxes/Containers",
+   "category": "Home & Functional",
+   "views": 146763,
+   "participants": 95,
+   "score": 5.7,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Laboratory Equipment",
+   "category": "Education & Social Good",
+   "views": 276194,
+   "participants": 557,
+   "score": 57.9,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Candy Dispenser",
+   "category": "Toys & Games",
+   "views": 323424,
+   "participants": 410,
+   "score": 47.4,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Chillin' Summer 2025",
+   "category": "Seasonal & Holidays",
+   "views": 379976,
+   "participants": 961,
+   "score": 85.4,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Photography Accessories",
+   "category": "Home & Functional",
+   "views": 401255,
+   "participants": 529,
+   "score": 68.3,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Master: Mini Arcade",
+   "category": "Engineering & Tech",
+   "views": 293431,
+   "participants": 381,
+   "score": 39.9,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Diorama",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 287805,
+   "participants": 559,
+   "score": 56.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "CyberBrick Master: Scenes & Maps",
+   "category": "Engineering & Tech",
+   "views": 335282,
+   "participants": 301,
+   "score": 32.4,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Automobile",
+   "category": "Engineering & Tech",
+   "views": 95521,
+   "participants": 40,
+   "score": 1.0,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Dino Safari",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 254657,
+   "participants": 675,
+   "score": 64.4,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Built to Flex",
+   "category": "Toys & Games",
+   "views": 324962,
+   "participants": 555,
+   "score": 62.8,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Painting Tools",
+   "category": "Home & Functional",
+   "views": 291269,
+   "participants": 664,
+   "score": 67.7,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Jewelry Box",
+   "category": "Home & Functional",
+   "views": 245744,
+   "participants": 548,
+   "score": 53.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Glow Within",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 335272,
+   "participants": 824,
+   "score": 77.3,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Key Covers",
+   "category": "Home & Functional",
+   "views": 416191,
+   "participants": 592,
+   "score": 67.1,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Power Meets Creativity",
+   "category": "Engineering & Tech",
+   "views": 358666,
+   "participants": 221,
+   "score": 32.0,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Greek Mythology",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 304646,
+   "participants": 837,
+   "score": 76.0,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Master: Battleship",
+   "category": "Engineering & Tech",
+   "views": 279817,
+   "participants": 455,
+   "score": 41.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Cathedral",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 173841,
+   "participants": 314,
+   "score": 24.3,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Halloween 2025",
+   "category": "Seasonal & Holidays",
+   "views": 728215,
+   "participants": 3047,
+   "score": 99.1,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Master: Conveyor Belt",
+   "category": "Engineering & Tech",
+   "views": 296237,
+   "participants": 162,
+   "score": 22.2,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Baby Stroller Accessories",
+   "category": "Home & Functional",
+   "views": 265572,
+   "participants": 275,
+   "score": 25.3,
+   "tier": "C"
+  },
+  {
+   "contest_name": "CyberBrick Master: Compatible Remotes",
+   "category": "Engineering & Tech",
+   "views": 199653,
+   "participants": 72,
+   "score": 10.2,
+   "tier": "C"
+  },
+  {
+   "contest_name": "realme GT8 Pro Deco",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 170158,
+   "participants": 285,
+   "score": 15.8,
+   "tier": "C"
+  },
+  {
+   "contest_name": "TRYX Open-frame Case",
+   "category": "Home & Functional",
+   "views": 249205,
+   "participants": 78,
+   "score": 14.6,
+   "tier": "C"
+  },
+  {
+   "contest_name": "The Vortek: Zero Compromise",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 175536,
+   "participants": 389,
+   "score": 30.8,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Printmas 2025",
+   "category": "Seasonal & Holidays",
+   "views": 636726,
+   "participants": 3634,
+   "score": 99.2,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Snowball Fight",
+   "category": "Seasonal & Holidays",
+   "views": 236829,
+   "participants": 230,
+   "score": 20.5,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Torch",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 176811,
+   "participants": 407,
+   "score": 28.1,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Master: Portable Vacuum Cleaner",
+   "category": "Engineering & Tech",
+   "views": 247900,
+   "participants": 218,
+   "score": 19.7,
+   "tier": "C"
+  },
+  {
+   "contest_name": "@Kit Crafters Mecha Remix",
+   "category": "Engineering & Tech",
+   "views": 151826,
+   "participants": 155,
+   "score": 6.8,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Scepter",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 155431,
+   "participants": 368,
+   "score": 24.4,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Master: Book Nook",
+   "category": "Engineering & Tech",
+   "views": 266146,
+   "participants": 526,
+   "score": 48.9,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Year of the Horse",
+   "category": "Seasonal & Holidays",
+   "views": 170013,
+   "participants": 885,
+   "score": 62.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Layered with Love: 2026 Valentine's Day",
+   "category": "Seasonal & Holidays",
+   "views": 354838,
+   "participants": 2769,
+   "score": 91.1,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Master: Wearable Armor",
+   "category": "Engineering & Tech",
+   "views": 252012,
+   "participants": 327,
+   "score": 27.7,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Home Bar",
+   "category": "Home & Functional",
+   "views": 263086,
+   "participants": 750,
+   "score": 64.8,
+   "tier": "B"
+  },
+  {
+   "contest_name": "@prime_tower - Old World Magic",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 152973,
+   "participants": 408,
+   "score": 30.9,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Hair Accessories",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 161365,
+   "participants": 386,
+   "score": 28.5,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Hop Into Creativity: Easter 2026",
+   "category": "Seasonal & Holidays",
+   "views": 325865,
+   "participants": 2074,
+   "score": 88.2,
+   "tier": "S"
+  },
+  {
+   "contest_name": "Expect the Unexpected: April Fools' Day",
+   "category": "Seasonal & Holidays",
+   "views": 280869,
+   "participants": 603,
+   "score": 59.1,
+   "tier": "B"
+  },
+  {
+   "contest_name": "@wuguigui CyberBrick RC Cars Remix",
+   "category": "Engineering & Tech",
+   "views": 113333,
+   "participants": 106,
+   "score": 3.6,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Bonsai",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 245063,
+   "participants": 525,
+   "score": 44.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "@Pi-Guy - Filament Recycling",
+   "category": "Home & Functional",
+   "views": 382748,
+   "participants": 304,
+   "score": 39.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "@JamesDaRock - Pieksekisten",
+   "category": "Education & Social Good",
+   "views": 305953,
+   "participants": 1008,
+   "score": 81.4,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Football Fan Spirit",
+   "category": "Toys & Games",
+   "views": 194497,
+   "participants": 600,
+   "score": 54.3,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Wind Spinner",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 245283,
+   "participants": 295,
+   "score": 26.9,
+   "tier": "C"
+  },
+  {
+   "contest_name": "@Stag3D - Spring Play",
+   "category": "Toys & Games",
+   "views": 198658,
+   "participants": 530,
+   "score": 47.6,
+   "tier": "B"
+  },
+  {
+   "contest_name": "@Mafagrafos - Parametric Home Decor",
+   "category": "Home & Functional",
+   "views": 225682,
+   "participants": 777,
+   "score": 65.4,
+   "tier": "A"
+  },
+  {
+   "contest_name": "@scottyujan - Home Gallery",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 255826,
+   "participants": 1276,
+   "score": 78.1,
+   "tier": "A"
+  },
+  {
+   "contest_name": "Cup Holder",
+   "category": "Home & Functional",
+   "views": 246106,
+   "participants": 836,
+   "score": 64.7,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Children's Toy",
+   "category": "Toys & Games",
+   "views": 371590,
+   "participants": 1756,
+   "score": 90.5,
+   "tier": "S"
+  },
+  {
+   "contest_name": "@SabreDesign & @Collecticraft - Moku System",
+   "category": "Toys & Games",
+   "views": 222510,
+   "participants": 152,
+   "score": 14.5,
+   "tier": "C"
+  },
+  {
+   "contest_name": "@everythingDND - The Breach",
+   "category": "Toys & Games",
+   "views": 152270,
+   "participants": 474,
+   "score": 37.1,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Pet Feeder",
+   "category": "Home & Functional",
+   "views": 177347,
+   "participants": 522,
+   "score": 39.0,
+   "tier": "B"
+  },
+  {
+   "contest_name": "@Pipin.World BONBON Capsules",
+   "category": "Toys & Games",
+   "views": 108252,
+   "participants": 556,
+   "score": 46.5,
+   "tier": "B"
+  },
+  {
+   "contest_name": "@Bavaria_3D Tanks T-34 Evolution Remix",
+   "category": "Engineering & Tech",
+   "views": 97063,
+   "participants": 49,
+   "score": 1.1,
+   "tier": "C"
+  },
+  {
+   "contest_name": "@MeshBear - Exoskeleton & Articulated Mechanism",
+   "category": "Engineering & Tech",
+   "views": 155239,
+   "participants": 240,
+   "score": 11.8,
+   "tier": "C"
+  },
+  {
+   "contest_name": "MakerWorld x Insta360 Luna Ultra",
+   "category": "Engineering & Tech",
+   "views": 173303,
+   "participants": 192,
+   "score": 13.7,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Homer's Epics",
+   "category": "Art, D\u00e9cor & Fashion",
+   "views": 162182,
+   "participants": 419,
+   "score": 31.3,
+   "tier": "C"
+  },
+  {
+   "contest_name": "@Ozarkexpeditions - PlayGrid Board Games",
+   "category": "Toys & Games",
+   "views": 166192,
+   "participants": 165,
+   "score": 9.8,
+   "tier": "C"
+  },
+  {
+   "contest_name": "@michelem - Basecamp Anywhere",
+   "category": "Home & Functional",
+   "views": 158618,
+   "participants": 558,
+   "score": 45.0,
+   "tier": "B"
+  },
+  {
+   "contest_name": "Pool Party",
+   "category": "Seasonal & Holidays",
+   "views": 109376,
+   "participants": 306,
+   "score": 18.5,
+   "tier": "C"
+  },
+  {
+   "contest_name": "Bug Off",
+   "category": "Home & Functional",
+   "views": 103831,
+   "participants": 300,
+   "score": 14.8,
+   "tier": "C"
+  }
+ ],
+ "cat_best_worst": {
+  "Art, D\u00e9cor & Fashion": {
+   "best": "Becoming A Hunter",
+   "best_score": 84.0,
+   "worst": "realme GT8 Pro Deco",
+   "worst_score": 15.8
+  },
+  "Education & Social Good": {
+   "best": "@JamesDaRock - Pieksekisten",
+   "best_score": 81.4,
+   "worst": "Biological Models",
+   "worst_score": 21.9
+  },
+  "Engineering & Tech": {
+   "best": "3DBenchy 10th Anniversary",
+   "best_score": 92.2,
+   "worst": "Automobile",
+   "worst_score": 1.0
+  },
+  "Home & Functional": {
+   "best": "Gardening Tool",
+   "best_score": 92.5,
+   "worst": "Boxes/Containers",
+   "worst_score": 5.7
+  },
+  "Seasonal & Holidays": {
+   "best": "Cozy Christmas",
+   "best_score": 99.5,
+   "worst": "2024 Calendar",
+   "worst_score": 16.6
+  },
+  "Toys & Games": {
+   "best": "Children's Toy",
+   "best_score": 90.5,
+   "worst": "@Ozarkexpeditions - PlayGrid Board Games",
+   "worst_score": 9.8
+  }
+ }
+};
+const fmt = n => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'k' : String(n);
+const catColors = {"Seasonal & Holidays":"#e03131","Home & Functional":"#1c7ed6","Toys & Games":"#f08c00","Art, Décor & Fashion":"#ae3ec9","Engineering & Tech":"#495057","Education & Social Good":"#0ca678"};
+const tierColors = {S:"#e03131",A:"#f08c00",B:"#1c7ed6",C:"#868e96"};
+Chart.defaults.font.family = "system-ui,sans-serif";
+Chart.defaults.maintainAspectRatio = false;
+
+// KPIs
+const k = R.kpis;
+document.getElementById('kpis').innerHTML = [
+  [k.contests,'Contests'],[fmt(k.models)+'+','Models submitted'],[fmt(k.participants),'Participations'],[fmt(k.views),'Contest views'],[R.holiday.share_models+'%','Models from 12 holiday contests']
+].map(([v,l])=>`<div class="stat-box"><div class="stat-value">${v}</div><div class="stat-label">${l}</div></div>`).join('');
+document.getElementById('nfin').textContent = k.finished;
+document.getElementById('nfin2').textContent = k.finished;
+document.getElementById('nhol').textContent = R.holiday.n;
+document.getElementById('vage').textContent = R.views_age_corr;
+
+const short = s => s.length > 34 ? s.slice(0,32)+'…' : s;
+function hbar(id, rows, reverse){
+  new Chart(document.getElementById(id), {type:'bar',
+    data:{labels:rows.map(r=>short(r.contest_name)), datasets:[{data:rows.map(r=>r.score), backgroundColor:rows.map(r=>catColors[r.category]), borderRadius:4}]},
+    options:{indexAxis:'y', scales:{x:{min:0,max:100,title:{display:true,text:'Composite score'}}},
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>{const r=rows[c.dataIndex];return [`Score ${r.score} (Tier ${r.tier})`, r.category+' · '+r.host_type, `${r.models.toLocaleString()} models · ${r.participants.toLocaleString()} participants · ${fmt(r.views)} views`]}}}}}});
+}
+hbar('bestChart', R.best);
+hbar('worstChart', R.worst);
+
+// category charts
+const cats = R.category;
+new Chart(document.getElementById('catScore'), {type:'bar',
+  data:{labels:cats.map(c=>c.category), datasets:[{data:cats.map(c=>c.avg_score), backgroundColor:cats.map(c=>catColors[c.category]), borderRadius:4}]},
+  options:{indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{min:0,max:100}}}});
+
+const tierCount = {};
+R.scatter.forEach(r=>{tierCount[r.category]=tierCount[r.category]||{S:0,A:0,B:0,C:0}; tierCount[r.category][r.tier]++;});
+new Chart(document.getElementById('catTier'), {type:'bar',
+  data:{labels:cats.map(c=>c.category), datasets:['S','A','B','C'].map(t=>({label:'Tier '+t, data:cats.map(c=>tierCount[c.category][t]), backgroundColor:tierColors[t]}))},
+  options:{indexAxis:'y', scales:{x:{stacked:true},y:{stacked:true}}}});
+
+new Chart(document.getElementById('matrix'), {type:'bubble',
+  data:{datasets:cats.map(c=>({label:c.category, data:[{x:c.median_views, y:c.median_participants, r:Math.sqrt(c.contests)*3.2}], backgroundColor:catColors[c.category]+'aa', borderColor:catColors[c.category]}))},
+  options:{scales:{x:{title:{display:true,text:'Median views'},ticks:{callback:v=>fmt(v)}}, y:{title:{display:true,text:'Median participants'}}},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12}}, tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw.x)} views · ${c.raw.y} participants`}}}}});
+
+new Chart(document.getElementById('share'), {type:'doughnut',
+  data:{labels:cats.map(c=>c.category), datasets:[{data:cats.map(c=>c['share_of_models_%']), backgroundColor:cats.map(c=>catColors[c.category])}]},
+  options:{plugins:{legend:{position:'right',labels:{boxWidth:12}}, tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw}%`}}}}});
+
+// category table
+const cbw = R.cat_best_worst;
+document.getElementById('catTable').innerHTML = '<tr><th>Category</th><th>Contests</th><th>Avg score</th><th>Median participants</th><th>Median views</th><th>🥇 Best contest</th><th>🥉 Worst contest</th></tr>' +
+  cats.map(c=>`<tr><td><b style="color:${catColors[c.category]}">${c.category}</b></td><td>${c.contests}</td><td>${c.avg_score}</td><td>${Math.round(c.median_participants)}</td><td>${fmt(c.median_views)}</td><td>${cbw[c.category].best} <small>(${cbw[c.category].best_score})</small></td><td>${cbw[c.category].worst} <small>(${cbw[c.category].worst_score})</small></td></tr>`).join('');
+
+// seasonality
+const mNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+new Chart(document.getElementById('month'), {type:'bar',
+  data:{labels:mNames, datasets:[{data:mNames.map((m,i)=>R.monthly[i+1]), backgroundColor:mNames.map((m,i)=>i>=8?'#ff6b6b':'#667eea'), borderRadius:4}]},
+  options:{plugins:{legend:{display:false}}, scales:{y:{title:{display:true,text:'Median participants'}}}}});
+
+const hs = R.host;
+new Chart(document.getElementById('host'), {type:'bar',
+  data:{labels:hs.map(h=>h.host_type+' ('+h.contests+')'), datasets:[
+    {label:'Median participants', data:hs.map(h=>h.median_participants), backgroundColor:'#667eea', yAxisID:'y'},
+    {label:'Median views', data:hs.map(h=>h.median_views), backgroundColor:'#ffa94d', yAxisID:'y1'}]},
+  options:{scales:{y:{position:'left',title:{display:true,text:'Participants'}}, y1:{position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>fmt(v)},title:{display:true,text:'Views'}}}}});
+
+new Chart(document.getElementById('cannibal'), {type:'bar',
+  data:{labels:['Jan–Aug (regular)','Sep–Dec (regular)','Holiday mega-contests'], datasets:[{data:[R.cannibal.off_season, R.cannibal.in_season, R.holiday.mega_median], backgroundColor:['#667eea','#ff6b6b','#e03131'], borderRadius:4}]},
+  options:{plugins:{legend:{display:false}}, scales:{y:{title:{display:true,text:'Median participants'}}}}});
+
+const yr = R.yearly;
+new Chart(document.getElementById('year'), {data:{labels:yr.map(y=>y.year+(y.year==2026?' (YTD)':'')+(y.year==2023?' (Q4)':'')), datasets:[
+  {type:'bar', label:'Contests', data:yr.map(y=>y.contests), backgroundColor:'#b197fc', yAxisID:'y'},
+  {type:'bar', label:'Creator-hosted', data:yr.map(y=>y.creator_hosted), backgroundColor:'#ffa94d', yAxisID:'y'},
+  {type:'line', label:'Median participants', data:yr.map(y=>y.median_participants), borderColor:'#e03131', backgroundColor:'#e03131', yAxisID:'y1', tension:.3}]},
+  options:{scales:{y:{title:{display:true,text:'Contests'}}, y1:{position:'right',grid:{drawOnChartArea:false},title:{display:true,text:'Participants'}}}}});
+
+// insights
+const catBy = Object.fromEntries(cats.map(c=>[c.category,c]));
+const eng = catBy['Engineering & Tech'], sea = catBy['Seasonal & Holidays'], toy = catBy['Toys & Games'], home = catBy['Home & Functional'];
+const cannPct = Math.round((1 - R.cannibal.in_season / R.cannibal.off_season)*100);
+const insights = [
+  ['good','🎃 Holidays rule',`<span class="big">${R.holiday.lift}x participants</span>: the ${R.holiday.n} Halloween, Christmas, Valentine's and Easter contests brought in ${R.holiday.share_models}% of all models submitted. Printmas 2025 alone received 7,078 models.`],
+  ['warn','🗓️ Holiday cannibalization',`<span class="big">−${cannPct}% participants</span> for regular contests launched Sep–Dec (median ${R.cannibal.in_season} vs ${R.cannibal.off_season}). The holiday contests pull makers away from everything else.`],
+  ['bad','⚙️ Engineering = high curiosity, low entry',`<span class="big">${Math.round(eng.median_participants)} median participants</span> but ${fmt(eng.median_views)} median views, about the same reach as other categories. Hard briefs (CyberBrick, RC, mechanisms) attract viewers who don't submit. ${eng.contests} contests, only ${eng.s_or_a}% in Tier S/A.`],
+  ['','🏠 Home & Functional = reliable volume',`<span class="big">${home.contests} contests</span>, the largest category, with ${home.s_or_a}% in Tier S/A. Everyday problems (garden, bathroom, hangers, travel) consistently activate 500+ makers.`],
+  ['good','🧸 Toys & Games win hearts',`<span class="big">${fmt(toy.winner_likes_per_winner)} likes per winning model</span>, the highest of any category. Fewer entries, but the winners are the most loved by the community.`],
+  ['bad','🤝 Creator & brand contests lag',`Creator-hosted contests get <span class="big">${fmt(hs.find(h=>h.host_type==='Creator-hosted').median_views)} median views</span> vs ${fmt(hs.find(h=>h.host_type==='Official').median_views)} for official ones. Brand-sponsored contests get ${R.brand.sponsored} median participants vs ${R.brand.not}. Prize size shows no link to participation (ρ = ${R.prize_corr}).`],
+];
+document.getElementById('insights').innerHTML = insights.map(([c,t,b])=>`<div class="insight ${c}"><h3>${t}</h3><p>${b}</p></div>`).join('');
+
+// tier table with tabs
+const tierDesc = {S:'Flagship: plan the calendar around these', A:'Strong, repeatable performers', B:'Solid, depends on timing and brief', C:'Underperformers: rethink format or timing'};
+const tabs = document.getElementById('tierTabs');
+['S','A','B','C'].forEach((t,i)=>{const b=document.createElement('button'); b.textContent=`Tier ${t} (${R.scatter.filter(r=>r.tier===t).length})`; if(!i) b.className='active';
+  b.onclick=()=>{[...tabs.children].forEach(x=>x.className=''); b.className='active'; renderTier(t)}; tabs.appendChild(b);});
+function renderTier(t){
+  const rows = R.scatter.filter(r=>r.tier===t).sort((a,b)=>b.score-a.score);
+  document.getElementById('tierTable').innerHTML = `<tr><th>Tier</th><th>Contest</th><th>Category</th><th>Participants</th><th>Views</th><th>Score</th></tr>` +
+    rows.map(r=>`<tr><td><span class="tier ${t}">${t}</span></td><td>${r.contest_name}</td><td style="color:${catColors[r.category]}">${r.category}</td><td>${r.participants.toLocaleString()}</td><td>${fmt(r.views)}</td><td>${r.score}</td></tr>`).join('') +
+    `<tr><td colspan="6" class="note">${tierDesc[t]}</td></tr>`;
+}
+renderTier('S');
+
+// recommendations
+document.getElementById('recs').innerHTML = [
+  '<b>Anchor the calendar on the 4 holiday flagships</b> (Halloween, Christmas, Valentine\'s, Easter). They are all Tier S and bring in about a third of all submissions.',
+  `<b>Protect regular contests in Sep–Dec:</b> run fewer of them, choose easy "Home & Functional" briefs, or extend their deadlines past the holiday contest (they lose about ${cannPct}% of participants).`,
+  '<b>Fill the rest of the year with Home & Functional problems</b> (garden, kitchen, bathroom, travel). This is the most reliable category for 500+ makers.',
+  '<b>Lower the entry barrier for Engineering & Tech:</b> offer starter templates, remix bases, or a "beginner" prize track to convert viewers into entrants.',
+  '<b>Give creator-hosted and brand contests more promotion</b> (homepage slot, newsletter): their briefs work (Home Gallery, Pieksekisten reached Tier A), but they get about half the visibility.',
+  '<b>Don\'t rely on bigger prizes:</b> prize size doesn\'t predict participation. Theme and timing matter more.'
+].map(x=>`<li>${x}</li>`).join('');
+
+document.getElementById('strategy').innerHTML = '<tr><th>Goal</th><th>Best category</th><th>Example</th><th>Expected result</th></tr>' + [
+  ['Maximum participation','Seasonal & Holidays','Printmas 2025','2,000–3,600 participants'],
+  ['Steady volume all year','Home & Functional','Gardening Tool','~540 median participants'],
+  ['Most-loved winning designs','Toys & Games','Children\'s Toy','Highest likes per winner'],
+  ['Community & purpose','Education & Social Good','Pieksekisten','Tier A even when creator-hosted'],
+  ['Showcase advanced skill','Engineering & Tech','3DBenchy 10th Anniversary','High views, needs a low-barrier brief']
+].map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
+</script>
+</body>
+</html>
