@@ -94,7 +94,7 @@ footer{text-align:center;color:#fff;opacity:.9;padding:10px}
     <div class="stat-box"><div class="stat-value">7</div><div class="stat-label">Delivery steps</div></div>
     <div class="stat-box"><div class="stat-value">1–4</div><div class="stat-label">Weeks per sprint</div></div>
     <div class="stat-box"><div class="stat-value">~2</div><div class="stat-label">Months per release</div></div>
-    <div class="stat-box"><div class="stat-value">9</div><div class="stat-label">Free templates</div></div>
+    <div class="stat-box"><div class="stat-value">15</div><div class="stat-label">Free templates</div></div>
   </div>
   <div class="links">
     <a href="https://github.com/flaakira/dmaic-agile-delivery-framework" target="_blank">💻 GitHub repo</a>
@@ -139,6 +139,7 @@ footer{text-align:center;color:#fff;opacity:.9;padding:10px}
     <div class="arrow">➜</div>
     <div class="pill">✅ Completed product</div>
   </div>
+  <p style="text-align:center;margin-top:16px">📄 Templates: <a href="https://github.com/flaakira/dmaic-agile-delivery-framework/blob/main/templates/13-sprint-ceremonies.md" target="_blank" style="color:#667eea;font-weight:600">Sprint planning, daily scrum, review &amp; retro</a> · <a href="https://github.com/flaakira/dmaic-agile-delivery-framework/blob/main/templates/07-user-story-and-estimation.md" target="_blank" style="color:#667eea;font-weight:600">User story &amp; story points</a></p>
   <div class="phases"><span>Plan</span><span>➜</span><span>Design</span><span>➜</span><span>Build</span><span>➜</span><span>Test</span><span>➜</span><span>Review</span><span>➜</span><span>Launch</span><span>🔁 next sprint</span></div>
 </section>
 
@@ -175,10 +176,10 @@ footer{text-align:center;color:#fff;opacity:.9;padding:10px}
 const REPO='https://github.com/flaakira/dmaic-agile-delivery-framework/blob/main/templates/';
 const dmaic=[
  {k:'D',name:'Define',q:'What problem are we solving, for whom, and how will we know we succeeded?',tools:['Project charter','Stakeholder mapping','SMART goal'],out:['Signed charter with scope and goal','Stakeholder map and communication plan'],tpl:[['01-project-charter.md','Project charter'],['02-stakeholder-map.md','Stakeholder map']]},
- {k:'M',name:'Measure',q:'How big is the problem today, and can we trust the data?',tools:['KPI measurement','Measurement system analysis (MSA)','Data collection plan'],out:['KPI definitions with baseline and target','Validated data sources'],tpl:[['03-data-collection-plan.md','Data collection plan & KPI card']]},
+ {k:'M',name:'Measure',q:'How big is the problem today, and can we trust the data?',tools:['KPI measurement','Measurement system analysis (MSA)','Data collection plan'],out:['KPI definitions with baseline and target','Validated data sources'],tpl:[['03-data-collection-plan.md','Data collection plan & KPI card'],['11-measurement-system-analysis.md','Measurement system analysis (MSA)']]},
  {k:'A',name:'Analyze',q:'What is really causing the problem?',tools:['Root cause analysis (RCA)','Fishbone diagram & 5 Whys','Critical factor identification (Pareto)'],out:['Confirmed root causes, backed by data'],tpl:[['04-root-cause-analysis.md','Root cause analysis']]},
- {k:'I',name:'Improve',q:'Which solutions give the most impact for the effort, and what exactly do we build?',tools:['Prioritization chart (impact vs effort)','Low-code solutions, delivered as features','Requirements gathering','Business requirements documents (BRD)'],out:['Prioritized features in the product backlog','Approved BRDs'],tpl:[['05-prioritization-matrix.md','Prioritization chart'],['06-business-requirements-document.md','BRD']]},
- {k:'C',name:'Control',q:'How do we make the improvement stick?',tools:['Training','Revamped processes','Newly defined KPIs','Communication','Product launch (about every 2 months)'],out:['Control plan with KPI alerts','Trained users and updated SOPs'],tpl:[['09-control-plan.md','Control plan']]}
+ {k:'I',name:'Improve',q:'Which solutions give the most impact for the effort, and what exactly do we build?',tools:['Prioritization chart (impact vs effort)','Low-code solutions, delivered as features','Requirements gathering','Business requirements documents (BRD)'],out:['Prioritized features in the product backlog','Approved BRDs'],tpl:[['05-prioritization-matrix.md','Prioritization chart'],['10-requirements-gathering-guide.md','Requirements gathering guide'],['06-business-requirements-document.md','BRD'],['12-low-code-solution-design.md','Low-code solution design']]},
+ {k:'C',name:'Control',q:'How do we make the improvement stick?',tools:['Training','Revamped processes','Newly defined KPIs','Communication','Product launch (about every 2 months)'],out:['Control plan with KPI alerts','Trained users and updated SOPs'],tpl:[['09-control-plan.md','Control plan'],['14-training-and-communication-plan.md','Training & communication plan'],['15-release-and-launch-notes.md','Release & launch notes']]}
 ];
 const stepper=document.getElementById('stepper'), panel=document.getElementById('panel');
 function show(i){
@@ -203,22 +204,23 @@ days.oninput=est; est();
 
 const roles=['Product Manager','Business Analyst','CI Analyst','BI Analyst'];
 const steps=[
- ['Requirements gathering',[0,1],'Interview users and stakeholders, observe the current process and collect pain points. Output: a list of needs linked to the root causes from DMAIC.'],
- ['BRD creation',[1],'Turn the needs into a Business Requirements Document: scope, as-is / to-be process, functional requirements and acceptance criteria.'],
- ['Product & sprint backlog',[2,0],'Break the feature into stories, estimate story points and plan which stories go into the next sprint.'],
- ['Feature development',[3],'Build the solution: data models, dashboards, low-code apps or automations, tested against the acceptance criteria.'],
- ['UAT & demos',[2,3],'Users test the feature against real scenarios. Demo the result, log defects and get a go / no-go for launch.'],
- ['Training & comms',[1,0],'Prepare guides and training sessions, and tell every affected team what changes and when.'],
- ['Launch',[2,0],'Release the feature, update KPIs and dashboards, and schedule a post-launch review.']
+ ['Requirements gathering',[0,1],'Interview users and stakeholders, observe the current process and collect pain points. Output: a list of needs linked to the root causes from DMAIC.',['10-requirements-gathering-guide.md','Requirements gathering guide']],
+ ['BRD creation',[1],'Turn the needs into a Business Requirements Document: scope, as-is / to-be process, functional requirements and acceptance criteria.',['06-business-requirements-document.md','BRD']],
+ ['Product & sprint backlog',[2,0],'Break the feature into stories, estimate story points and plan which stories go into the next sprint.',['07-user-story-and-estimation.md','User story guide'],['13-sprint-ceremonies.md','Sprint ceremonies']],
+ ['Feature development',[3],'Build the solution: data models, dashboards, low-code apps or automations, tested against the acceptance criteria.',['12-low-code-solution-design.md','Low-code solution design']],
+ ['UAT & demos',[2,3],'Users test the feature against real scenarios. Demo the result, log defects and get a go / no-go for launch.',['08-uat-checklist.md','UAT checklist']],
+ ['Training & comms',[1,0],'Prepare guides and training sessions, and tell every affected team what changes and when.',['14-training-and-communication-plan.md','Training & communication plan']],
+ ['Launch',[2,0],'Release the feature, update KPIs and dashboards, and schedule a post-launch review.',['15-release-and-launch-notes.md','Release & launch notes']]
 ];
 const cyc=document.getElementById('cycle'), info=document.getElementById('stepinfo');
 steps.forEach((s,i)=>{const d=document.createElement('div');d.className='step';d.innerHTML=`<div class="num">${i+1}</div><div class="t">${s[0]}</div><div class="r">${s[1].map(r=>roles[r]).join('<br>')}</div>`;
- d.onclick=()=>{[...cyc.children].forEach(x=>x.classList.remove('on'));d.classList.add('on');info.innerHTML=`<b>${i+1}. ${s[0]}</b> · <span style="color:#764ba2">${s[1].map(r=>roles[r]).join(' + ')}</span><br>${s[2]}`};cyc.appendChild(d)});
+ d.onclick=()=>{[...cyc.children].forEach(x=>x.classList.remove('on'));d.classList.add('on');info.innerHTML=`<b>${i+1}. ${s[0]}</b> · <span style="color:#764ba2">${s[1].map(r=>roles[r]).join(' + ')}</span><br>${s[2]}<br>📄 ${s.slice(3).map(([f,n])=>`<a href="${REPO+f}" target="_blank" style="color:#667eea;font-weight:600">${n}</a>`).join(' · ')}`};cyc.appendChild(d)});
 cyc.children[0].click();
 document.getElementById('roles').innerHTML='<tr><th>Step</th>'+roles.map(r=>`<th style="text-align:center">${r}</th>`).join('')+'</tr>'+
  steps.map((s,i)=>`<tr><td>${i+1}. ${s[0]}</td>${roles.map((r,j)=>`<td class="c">${s[1].includes(j)?'<span class="dot">●</span>':''}</td>`).join('')}</tr>`).join('');
 
-const tpls=[['01-project-charter.md','Project charter','Define'],['02-stakeholder-map.md','Stakeholder map','Define'],['03-data-collection-plan.md','Data collection plan & KPI card','Measure'],['04-root-cause-analysis.md','Root cause analysis (fishbone + 5 Whys)','Analyze'],['05-prioritization-matrix.md','Prioritization chart','Improve'],['06-business-requirements-document.md','Business requirements document','Improve'],['07-user-story-and-estimation.md','User story & story point guide','Agile'],['08-uat-checklist.md','UAT & demo checklist','Agile'],['09-control-plan.md','Control plan & launch checklist','Control']];
+const tpls=[['01-project-charter.md','Project charter','Define'],['02-stakeholder-map.md','Stakeholder map','Define'],['03-data-collection-plan.md','Data collection plan & KPI card','Measure'],['04-root-cause-analysis.md','Root cause analysis (fishbone + 5 Whys)','Analyze'],['05-prioritization-matrix.md','Prioritization chart','Improve'],['06-business-requirements-document.md','Business requirements document','Improve'],['07-user-story-and-estimation.md','User story & story point guide','Agile'],['08-uat-checklist.md','UAT & demo checklist','Agile'],['09-control-plan.md','Control plan & launch checklist','Control'],['10-requirements-gathering-guide.md','Requirements gathering guide','Improve · Step 1'],['11-measurement-system-analysis.md','Measurement system analysis (MSA)','Measure'],['12-low-code-solution-design.md','Low-code solution design','Improve · Step 4'],['13-sprint-ceremonies.md','Sprint planning, daily scrum, review & retro','Agile'],['14-training-and-communication-plan.md','Training & communication plan','Control · Step 6'],['15-release-and-launch-notes.md','Release & launch notes','Control · Step 7']];
+tpls.sort((a,b)=>a[0].localeCompare(b[0]));
 document.getElementById('templates').innerHTML=tpls.map(([f,n,p])=>`<a href="${REPO+f}" target="_blank"><b>${n}</b><small>${p} · ${f}</small></a>`).join('');
 </script>
 </body>
