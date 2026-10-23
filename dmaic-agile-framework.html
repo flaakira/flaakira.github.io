@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DMAIC + Agile Framework</title>
+<meta name="description" content="How Lean Six Sigma (DMAIC) and Agile delivery work together: from problem to product, with roles, story points and reusable templates.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);color:#333;line-height:1.55}
+.container{max-width:1200px;margin:0 auto;padding:40px 20px}
+header{background:#fff;border-radius:10px;padding:40px;margin-bottom:40px;box-shadow:0 10px 40px rgba(0,0,0,.1);text-align:center}
+h1{font-size:2.5em;color:#667eea;margin-bottom:10px;line-height:1.2}
+.subtitle{font-size:1.1em;color:#666;margin-bottom:20px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin-top:20px}
+.stat-box{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px;border-radius:8px;text-align:center}
+.stat-value{font-size:1.8em;font-weight:bold}
+.stat-label{font-size:.85em;opacity:.9}
+.section{background:#fff;border-radius:10px;padding:40px;margin-bottom:40px;box-shadow:0 10px 40px rgba(0,0,0,.1)}
+h2{color:#667eea;font-size:1.8em;margin-bottom:20px;border-bottom:3px solid #667eea;padding-bottom:10px}
+h3{color:#764ba2;margin:10px 0}
+p.lead{color:#555;margin-bottom:20px}
+.links{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+.links a{background:#fff;border:2px solid #667eea;color:#667eea;padding:8px 18px;border-radius:20px;text-decoration:none;font-weight:600}
+.links a:hover{background:#667eea;color:#fff}
+/* DMAIC stepper */
+.stepper{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+.stepper button{border:none;border-radius:10px;padding:14px 8px;color:#fff;font-weight:700;font-size:1em;cursor:pointer;opacity:.55;transition:.2s}
+.stepper button .l{display:block;font-size:2em;line-height:1}
+.stepper button.active{opacity:1;transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.15)}
+.D{background:#5f6bf0}.M{background:#7b5cf0}.A{background:#9b4fe0}.I{background:#c4459b}.C{background:#e0596b}
+.panel{background:#f8f9fa;border-radius:10px;padding:25px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:20px;border-top:5px solid #667eea}
+.panel h4{color:#764ba2;margin-bottom:8px}
+.panel ul{margin-left:20px}
+.panel .q{grid-column:1/-1;font-size:1.15em;font-weight:600;color:#444}
+.panel a{color:#667eea;font-weight:600}
+.bridge{margin-top:20px;background:#fff6e5;border-left:5px solid #f0a020;padding:15px 20px;border-radius:8px}
+/* breakdown */
+.chain{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.chain span{border:2px solid #667eea;border-radius:20px;padding:6px 16px;font-weight:700;color:#4c3fbf}
+.chain i{color:#aaa;font-style:normal}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:30px}
+table{width:100%;border-collapse:collapse;font-size:.95em}
+th{background:#667eea;color:#fff;text-align:left;padding:10px 12px}
+td{padding:9px 12px;border-bottom:1px solid #eee}
+tr:hover td{background:#f5f3ff}
+td.pt{font-weight:800;color:#764ba2;text-align:center;width:60px}
+tr.hl td{background:#ede9ff}
+.estimator{background:#f8f9fa;border-radius:10px;padding:25px}
+.estimator label{font-weight:600;display:block;margin-bottom:8px}
+.estimator input[type=range]{width:100%}
+.result{margin-top:15px;font-size:1.1em}
+.result .big{font-size:2.2em;font-weight:800;color:#764ba2;display:block}
+/* sprint */
+.sprintrow{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center}
+.pill{background:#f8f9fa;border:2px solid #d9d6f3;border-radius:10px;padding:12px 16px;font-weight:700;text-align:center}
+.ring{width:170px;height:170px;border-radius:50%;border:16px solid #22b573;border-right-color:#7bdcb5;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;color:#1a8a57;font-size:1.4em;position:relative}
+.ring small{font-size:.6em;color:#555}
+.ring .tag{position:absolute;top:-12px;right:-26px;background:#4c3fbf;color:#fff;font-size:.5em;padding:3px 10px;border-radius:10px}
+.arrow{color:#aaa;font-size:1.5em}
+.phases{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+.phases span{background:#f1effc;border-radius:16px;padding:5px 14px;font-weight:600;color:#555}
+/* cycle */
+.cycle{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:12px}
+.step{background:#f8f9fa;border-radius:10px;padding:16px 10px;text-align:center;cursor:pointer;border:2px solid transparent;transition:.2s}
+.step:hover,.step.on{border-color:#667eea;background:#f1effc}
+.num{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 8px}
+.step .t{font-weight:700}
+.step .r{font-size:.85em;color:#764ba2;margin-top:6px}
+.stepinfo{margin-top:16px;background:#f8f9fa;border-radius:10px;padding:18px 22px;min-height:70px}
+.dot{color:#667eea;font-size:1.3em;text-align:center}
+td.c{text-align:center}
+.templates{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px}
+.templates a{display:block;background:#f8f9fa;border-left:5px solid #667eea;border-radius:8px;padding:12px 16px;text-decoration:none;color:#333}
+.templates a:hover{background:#f1effc}
+.templates a b{color:#4c3fbf}
+.templates a small{display:block;color:#777}
+.note{font-size:.9em;color:#777;margin-top:12px}
+ol,ul{margin-left:22px}
+li{margin-bottom:6px}
+footer{text-align:center;color:#fff;opacity:.9;padding:10px}
+.table-wrap{overflow-x:auto}
+@media(max-width:700px){.container{padding:16px}header,.section{padding:22px}h1{font-size:1.8em}h2{font-size:1.4em}.stepper{grid-template-columns:repeat(5,1fr);gap:5px}.stepper button{padding:10px 2px;font-size:.75em}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🔄 From Problem to Product</h1>
+  <div class="subtitle">How I combine Lean Six Sigma (DMAIC) with Agile delivery as a BI / Continuous Improvement Analyst</div>
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-value">5</div><div class="stat-label">DMAIC phases</div></div>
+    <div class="stat-box"><div class="stat-value">7</div><div class="stat-label">Delivery steps</div></div>
+    <div class="stat-box"><div class="stat-value">1–4</div><div class="stat-label">Weeks per sprint</div></div>
+    <div class="stat-box"><div class="stat-value">~2</div><div class="stat-label">Months per release</div></div>
+    <div class="stat-box"><div class="stat-value">9</div><div class="stat-label">Free templates</div></div>
+  </div>
+  <div class="links">
+    <a href="https://github.com/flaakira/dmaic-agile-delivery-framework" target="_blank">💻 GitHub repo</a>
+    <a href="https://github.com/flaakira/dmaic-agile-delivery-framework/tree/main/templates" target="_blank">📄 Templates</a>
+  </div>
+</header>
+
+<section class="section">
+  <h2>🎯 Why combine them?</h2>
+  <p class="lead">Continuous improvement teams often face two failure modes: a great root-cause analysis that never ships, or fast delivery that solves the wrong problem. This framework links the two. <b>DMAIC decides <i>what</i> to fix</b> using data and root causes. <b>Agile decides <i>how</i> to deliver it</b>, in small, tested pieces users can see every sprint.</p>
+  <img src="/img/posts/dmaic-agile-framework.png" alt="DMAIC and Agile delivery framework overview" style="width:100%;border-radius:10px;border:1px solid #eee">
+</section>
+
+<section class="section">
+  <h2>📐 Lean Six Sigma · DMAIC</h2>
+  <p class="lead">Click a phase to see its key question, tools and deliverables.</p>
+  <div class="stepper" id="stepper"></div>
+  <div class="panel" id="panel"></div>
+  <div class="bridge">🔗 <b>The bridge:</b> in <b>Improve</b>, each prioritized solution becomes a <b>feature</b> in the Agile product backlog. <b>Control</b> wraps up each release with training, revamped processes and new KPIs. The whole cycle ships a product launch about <b>every 2 months</b>.</div>
+</section>
+
+<section class="section">
+  <h2>🧱 Work Breakdown & Story Points</h2>
+  <div class="chain"><span>Project</span><i>➜</i><span>Feature</span><i>➜</i><span>Story</span><i>➜</i><span>Story points</span></div>
+  <div class="two">
+    <div class="table-wrap"><table id="points"><tr><th>Points</th><th>Meaning</th></tr></table></div>
+    <div class="estimator">
+      <label for="days">Try it: how long will this story take?</label>
+      <input type="range" id="days" min="0" max="5" step="1" value="1">
+      <div class="result"><span class="big" id="pt"></span><span id="ptxt"></span></div>
+      <p class="note">Stories estimated at 13 points are split before they enter a sprint, so every sprint item can finish in two weeks or less.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>🏃 Agile Delivery</h2>
+  <div class="sprintrow">
+    <div style="display:flex;flex-direction:column;gap:10px"><div class="pill">📋 Product backlog</div><div class="pill">🗂️ Sprint backlog</div></div>
+    <div class="arrow">➜</div>
+    <div class="ring"><span class="tag">Daily scrum</span>Sprint<small>1–4 weeks</small></div>
+    <div class="arrow">➜</div>
+    <div class="pill">✅ Completed product</div>
+  </div>
+  <div class="phases"><span>Plan</span><span>➜</span><span>Design</span><span>➜</span><span>Build</span><span>➜</span><span>Test</span><span>➜</span><span>Review</span><span>➜</span><span>Launch</span><span>🔁 next sprint</span></div>
+</section>
+
+<section class="section">
+  <h2>🚀 Feature Development Cycle</h2>
+  <p class="lead">Every feature follows the same seven steps. Click a step to see what happens there.</p>
+  <div class="cycle" id="cycle"></div>
+  <div class="stepinfo" id="stepinfo"></div>
+  <h3 style="margin-top:30px">Who is involved in each step</h3>
+  <div class="table-wrap"><table id="roles"></table></div>
+</section>
+
+<section class="section">
+  <h2>🧪 Illustrative Example</h2>
+  <p class="lead"><i>A hypothetical walk-through to show how the pieces connect. The numbers are made up for illustration.</i></p>
+  <ol>
+    <li><b>Define:</b> "18% of purchase requests are submitted with missing information, which delays approvals by days." Charter signed, stakeholders mapped (requesters, procurement, finance, approvers).</li>
+    <li><b>Measure:</b> "incomplete request" KPI defined (any request sent back for missing data). MSA shows two approvers log rejections differently, so the definition is fixed before taking the baseline.</li>
+    <li><b>Analyze:</b> fishbone + 5 Whys point to a free-text email request with no required fields. A Pareto chart shows 3 missing fields cause most rejections.</li>
+    <li><b>Improve:</b> the prioritization chart picks a low-code request form with required fields and lookups (high impact, low effort). It becomes a <b>feature</b> with 6 stories (2–5 points each) delivered in two sprints.</li>
+    <li><b>Control:</b> requesters trained, the email process retired, and the incomplete-request KPI added to the weekly dashboard with an alert above 5%. The feature ships in the next release.</li>
+  </ol>
+</section>
+
+<section class="section">
+  <h2>📄 Reusable Templates</h2>
+  <div class="templates" id="templates"></div>
+</section>
+
+<footer>Flavio Akira Tikaishi · BI &amp; Continuous Improvement · <a href="https://flaakira.github.io/" style="color:#fff">flaakira.github.io</a></footer>
+</div>
+
+<script>
+const REPO='https://github.com/flaakira/dmaic-agile-delivery-framework/blob/main/templates/';
+const dmaic=[
+ {k:'D',name:'Define',q:'What problem are we solving, for whom, and how will we know we succeeded?',tools:['Project charter','Stakeholder mapping','SMART goal'],out:['Signed charter with scope and goal','Stakeholder map and communication plan'],tpl:[['01-project-charter.md','Project charter'],['02-stakeholder-map.md','Stakeholder map']]},
+ {k:'M',name:'Measure',q:'How big is the problem today, and can we trust the data?',tools:['KPI measurement','Measurement system analysis (MSA)','Data collection plan'],out:['KPI definitions with baseline and target','Validated data sources'],tpl:[['03-data-collection-plan.md','Data collection plan & KPI card']]},
+ {k:'A',name:'Analyze',q:'What is really causing the problem?',tools:['Root cause analysis (RCA)','Fishbone diagram & 5 Whys','Critical factor identification (Pareto)'],out:['Confirmed root causes, backed by data'],tpl:[['04-root-cause-analysis.md','Root cause analysis']]},
+ {k:'I',name:'Improve',q:'Which solutions give the most impact for the effort, and what exactly do we build?',tools:['Prioritization chart (impact vs effort)','Low-code solutions, delivered as features','Requirements gathering','Business requirements documents (BRD)'],out:['Prioritized features in the product backlog','Approved BRDs'],tpl:[['05-prioritization-matrix.md','Prioritization chart'],['06-business-requirements-document.md','BRD']]},
+ {k:'C',name:'Control',q:'How do we make the improvement stick?',tools:['Training','Revamped processes','Newly defined KPIs','Communication','Product launch (about every 2 months)'],out:['Control plan with KPI alerts','Trained users and updated SOPs'],tpl:[['09-control-plan.md','Control plan']]}
+];
+const stepper=document.getElementById('stepper'), panel=document.getElementById('panel');
+function show(i){
+  [...stepper.children].forEach((b,j)=>b.classList.toggle('active',i===j));
+  const d=dmaic[i]; panel.style.borderTopColor=getComputedStyle(stepper.children[i]).backgroundColor;
+  panel.innerHTML=`<div class="q">❓ ${d.q}</div>
+   <div><h4>🛠️ Tools</h4><ul>${d.tools.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+   <div><h4>📦 Deliverables</h4><ul>${d.out.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+   <div><h4>📄 Templates</h4><ul>${d.tpl.map(([f,n])=>`<li><a href="${REPO+f}" target="_blank">${n}</a></li>`).join('')}</ul></div>`;
+}
+dmaic.forEach((d,i)=>{const b=document.createElement('button');b.className=d.k;b.innerHTML=`<span class="l">${d.k}</span>${d.name}`;b.onclick=()=>show(i);stepper.appendChild(b)});
+show(0);
+
+const pts=[[1,'Done in less than a day'],[2,'Done in 1 day'],[3,'Done in 2 days'],[5,'Done in a week'],[8,'Done in 2 weeks'],[13,'Too big: split into smaller stories']];
+const ptab=document.getElementById('points');
+pts.forEach(([p,m])=>{ptab.insertAdjacentHTML('beforeend',`<tr><td class="pt">${p}</td><td>${m}</td></tr>`)});
+const labels=['Less than a day','About 1 day','About 2 days','About a week','About 2 weeks','More than 2 weeks'];
+const days=document.getElementById('days');
+function est(){const i=+days.value;document.getElementById('pt').textContent=pts[i][0]+' points';document.getElementById('ptxt').textContent=labels[i]+(i===5?' → split this story before the sprint':' → fits in a sprint');
+ [...ptab.rows].slice(1).forEach((r,j)=>r.classList.toggle('hl',j===i));}
+days.oninput=est; est();
+
+const roles=['Product Manager','Business Analyst','CI Analyst','BI Analyst'];
+const steps=[
+ ['Requirements gathering',[0,1],'Interview users and stakeholders, observe the current process and collect pain points. Output: a list of needs linked to the root causes from DMAIC.'],
+ ['BRD creation',[1],'Turn the needs into a Business Requirements Document: scope, as-is / to-be process, functional requirements and acceptance criteria.'],
+ ['Product & sprint backlog',[2,0],'Break the feature into stories, estimate story points and plan which stories go into the next sprint.'],
+ ['Feature development',[3],'Build the solution: data models, dashboards, low-code apps or automations, tested against the acceptance criteria.'],
+ ['UAT & demos',[2,3],'Users test the feature against real scenarios. Demo the result, log defects and get a go / no-go for launch.'],
+ ['Training & comms',[1,0],'Prepare guides and training sessions, and tell every affected team what changes and when.'],
+ ['Launch',[2,0],'Release the feature, update KPIs and dashboards, and schedule a post-launch review.']
+];
+const cyc=document.getElementById('cycle'), info=document.getElementById('stepinfo');
+steps.forEach((s,i)=>{const d=document.createElement('div');d.className='step';d.innerHTML=`<div class="num">${i+1}</div><div class="t">${s[0]}</div><div class="r">${s[1].map(r=>roles[r]).join('<br>')}</div>`;
+ d.onclick=()=>{[...cyc.children].forEach(x=>x.classList.remove('on'));d.classList.add('on');info.innerHTML=`<b>${i+1}. ${s[0]}</b> · <span style="color:#764ba2">${s[1].map(r=>roles[r]).join(' + ')}</span><br>${s[2]}`};cyc.appendChild(d)});
+cyc.children[0].click();
+document.getElementById('roles').innerHTML='<tr><th>Step</th>'+roles.map(r=>`<th style="text-align:center">${r}</th>`).join('')+'</tr>'+
+ steps.map((s,i)=>`<tr><td>${i+1}. ${s[0]}</td>${roles.map((r,j)=>`<td class="c">${s[1].includes(j)?'<span class="dot">●</span>':''}</td>`).join('')}</tr>`).join('');
+
+const tpls=[['01-project-charter.md','Project charter','Define'],['02-stakeholder-map.md','Stakeholder map','Define'],['03-data-collection-plan.md','Data collection plan & KPI card','Measure'],['04-root-cause-analysis.md','Root cause analysis (fishbone + 5 Whys)','Analyze'],['05-prioritization-matrix.md','Prioritization chart','Improve'],['06-business-requirements-document.md','Business requirements document','Improve'],['07-user-story-and-estimation.md','User story & story point guide','Agile'],['08-uat-checklist.md','UAT & demo checklist','Agile'],['09-control-plan.md','Control plan & launch checklist','Control']];
+document.getElementById('templates').innerHTML=tpls.map(([f,n,p])=>`<a href="${REPO+f}" target="_blank"><b>${n}</b><small>${p} · ${f}</small></a>`).join('');
+</script>
+</body>
+</html>
