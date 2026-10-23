@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "From Problem to Product: Combining Lean Six Sigma (DMAIC) with Agile Delivery"
-subtitle: "The framework I use as a BI / Continuous Improvement Analyst, with roles, story points and 9 free templates"
+subtitle: "The framework I use as a BI / Continuous Improvement Analyst, with roles, story points and 15 free templates"
 date: 2026-10-23
 categories:
 - business-analysis
@@ -54,6 +54,15 @@ Product backlog → sprint backlog → **sprints of 1–4 weeks** with a daily s
 
 ## Free templates
 
-The GitHub repo includes 9 Markdown templates you can copy: project charter, stakeholder map, data collection plan & KPI card, root cause analysis, prioritization chart, BRD, user story & estimation guide, UAT checklist, and control plan.
+The GitHub repo has 15 Markdown templates you can copy, one for every step of the framework:
+
+| Phase / step | Templates |
+|---|---|
+| Define | Project charter · Stakeholder map |
+| Measure | Data collection plan & KPI card · Measurement system analysis (MSA) |
+| Analyze | Root cause analysis (fishbone + 5 Whys + Pareto) |
+| Improve | Prioritization chart · Requirements gathering guide · BRD · Low-code solution design |
+| Agile delivery | User story & story points · Sprint planning, daily scrum, review & retro · UAT checklist |
+| Control & launch | Control plan · Training & communication plan · Release & launch notes |
 
 *Tools & skills: Lean Six Sigma (Green Belt) · Agile/Scrum · requirements gathering · BRDs · KPI design · UAT · change management*
