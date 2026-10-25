@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pokemon Top Trumps: All Generations Analysis</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);color:#333;min-height:100vh}
+.container{max-width:1400px;margin:0 auto;padding:40px 20px}
+header{background:white;border-radius:10px;padding:40px;margin-bottom:40px;box-shadow:0 10px 40px rgba(0,0,0,.1);text-align:center}
+h1{font-size:2.5em;color:#667eea;margin-bottom:10px}
+.subtitle{font-size:1.1em;color:#666;margin-bottom:20px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:15px;margin-top:20px}
+.stat-box{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:15px;border-radius:8px;text-align:center}
+.stat-value{font-size:1.8em;font-weight:bold}
+.stat-label{font-size:.85em;opacity:.9}
+.section{background:white;border-radius:10px;padding:40px;margin-bottom:40px;box-shadow:0 10px 40px rgba(0,0,0,.1)}
+h2{color:#667eea;font-size:1.8em;margin-bottom:20px;border-bottom:3px solid #667eea;padding-bottom:10px}
+h3{color:#444;margin-bottom:8px}
+.lead{color:#555;line-height:1.6;margin-bottom:18px}
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(450px,100%),1fr));gap:30px;margin-bottom:30px}
+.chart-container{background:#f8f9fa;border-radius:8px;padding:20px;height:380px;position:relative}
+.chart-container.tall{height:560px}
+.insights{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:20px;margin-top:20px}
+.insight-card{background:#f5f7fa;padding:20px;border-radius:8px;border-left:5px solid #667eea;line-height:1.5}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin-top:15px;font-variant-numeric:tabular-nums}
+th{background:#667eea;color:white;padding:12px;text-align:left;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #eee}
+tr:hover td{background:#f5f7fa}
+td.n,th.n{text-align:right}
+#genTable{min-width:1150px}#genTable td.cards{min-width:210px;font-size:.9em;line-height:1.4}#tierTable td:first-child{white-space:nowrap}
+.tier-s{color:#ff6b6b;font-weight:bold}.tier-a{color:#ffa94d;font-weight:bold}.tier-f{color:#868e96;font-weight:bold}
+.matrix td,.matrix th{text-align:center;padding:9px 6px;font-size:.92em}
+.matrix th:first-child,.matrix td:first-child{text-align:left;white-space:nowrap}
+.matrix td.self{background:#f1f3f5;color:#adb5bd}
+.legend{display:flex;align-items:center;gap:8px;font-size:.85em;color:#666;margin-top:10px;flex-wrap:wrap}
+.legend span.sw{display:inline-block;width:60px;height:12px;border-radius:3px;background:linear-gradient(90deg,#ff8787,#f8f9fa,#69db7c)}
+.tests{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:15px}
+.test{background:#f5f7fa;border-radius:8px;padding:18px;border-top:4px solid #764ba2}
+.test b{display:block;font-size:1.5em;color:#667eea}
+.footer{text-align:center;color:white;padding:20px;margin-top:30px}
+.footer a{color:white}
+li{margin-left:20px;margin-bottom:8px;line-height:1.5}
+.play-cta{display:inline-flex;align-items:center;gap:10px;margin:10px 6px 5px;padding:14px 32px;background:linear-gradient(135deg,#ff6b6b,#ffa94d);color:white;font-size:1.15em;font-weight:bold;text-decoration:none;border-radius:50px;box-shadow:0 6px 20px rgba(255,107,107,.4);transition:transform .2s,box-shadow .2s}
+.play-cta:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,107,107,.5)}
+.play-cta.alt{background:white;color:#667eea;border:2px solid #667eea;box-shadow:none}
+.play-note{font-size:.95em;color:#666;margin-top:8px}
+.note{margin-top:15px;color:#666;font-size:.95em;line-height:1.5}
+@media(max-width:600px){header,.section{padding:22px 16px}h1{font-size:1.8em}h2{font-size:1.4em}.chart-container{height:340px;padding:10px}.chart-container.tall{height:520px}.play-cta{padding:12px 22px;font-size:1em}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>🎮 Pokemon Top Trumps: All 9 Generations</h1>
+<p class="subtitle">Competitive Analysis - 46,000 Simulated Games across Gen 1 to Gen 9</p>
+<a class="play-cta" href="https://flaakira.github.io/pokemon-top-trumps/" target="_blank" rel="noopener">🕹️ Play the Game</a>
+<a class="play-cta alt" href="https://flaakira.github.io/pokemon-analysis.html">📊 Original Gen 1 Analysis</a>
+<p class="play-note">The game now lets you pick any mix of generations before a match. This study tests every option.</p>
+<div class="stats-grid" id="kpis"></div>
+</header>
+
+<div class="section">
+<h2>🧪 Test Plan</h2>
+<p class="lead">Every game follows the live game's rules exactly: 6 v 6 knockout, a random stat each round, primary-type multipliers (1.2x / 0.8x), and the blocked-stat rule after a draw. Both sides pick stats at random, so the results measure the cards, not player skill.</p>
+<div class="tests" id="tests"></div>
+</div>
+
+<div class="section">
+<h2>🌍 Generation Comparison</h2>
+<p class="lead">Inside a single generation the match is fair: each side wins about half the time. The real difference shows when generations face each other. The newer generations (Gen 4, 7 and 9) carry higher stat totals and beat the original three generations about two times out of three.</p>
+<div class="charts-grid">
+<div class="chart-container"><canvas id="genVsChart"></canvas></div>
+<div class="chart-container"><canvas id="genBstChart"></canvas></div>
+</div>
+<div class="tbl"><table id="genTable"></table></div>
+</div>
+
+<div class="section">
+<h2>⚔️ Generation vs Generation</h2>
+<p class="lead">Game win rate of the row generation's team against the column generation's team. 1,000 games per pairing, with sides swapped every game so going first never favours either generation.</p>
+<div class="tbl"><table class="matrix" id="matrix"></table></div>
+<div class="legend">Row loses <span class="sw"></span> Row wins</div>
+</div>
+
+<div class="section">
+<h2>🧬 Type Ranking</h2>
+<p class="lead">Share of rounds won by Pokemon of each primary type, across all 46,000 games. Bars show the round win rate; the number of Pokemon with that primary type is in brackets.</p>
+<div class="chart-container tall"><canvas id="typeChart"></canvas></div>
+</div>
+
+<div class="section">
+<h2>🎯 Type Matchup Analysis</h2>
+<p class="lead">Round win rate for a primary type facing another primary type. Only matchups with at least 400 rounds are shown, so every bar rests on solid data.</p>
+<div class="charts-grid">
+<div class="chart-container"><canvas id="bestChart"></canvas></div>
+<div class="chart-container"><canvas id="worstChart"></canvas></div>
+</div>
+</div>
+
+<div class="section">
+<h2>📊 Strongest vs Weakest Pokemon</h2>
+<p class="lead">Round win rate for every one of the 1,025 Pokemon, pooled across all tests. Every Pokemon played at least 414 rounds.</p>
+<div class="charts-grid">
+<div class="chart-container"><canvas id="topChart"></canvas></div>
+<div class="chart-container"><canvas id="bottomChart"></canvas></div>
+</div>
+<div class="charts-grid" style="margin-bottom:0">
+<div><h3>🏆 Top 20</h3><div class="tbl"><table id="topTable"></table></div></div>
+<div><h3>⚠️ Most Vulnerable 20</h3><div class="tbl"><table id="botTable"></table></div></div>
+</div>
+</div>
+
+<div class="section">
+<h2>📈 Stats Decide the Card</h2>
+<p class="lead">A card's stat total (Attack + Defense + Sp. Attack + Sp. Defense + Speed, HP is not used in the game) predicts its win rate almost perfectly: the correlation is <strong>0.98</strong>. Type matters at the margins, but a big stat total matters most.</p>
+<div class="chart-container"><canvas id="bstChart"></canvas></div>
+</div>
+
+<div class="section">
+<h2>💡 Key Insights</h2>
+<div class="insights" id="insights"></div>
+</div>
+
+<div class="section">
+<h2>🏆 Pokemon Tier System</h2>
+<div class="tbl"><table id="tierTable"></table></div>
+</div>
+
+<div class="section">
+<h2>📋 Strategic Recommendations</h2>
+<h3 style="color:#667eea;margin:10px 0 15px 0">Picking generations:</h3>
+<ol id="recGen"></ol>
+<h3 style="color:#667eea;margin:20px 0 15px 0">Type Strategy Guide:</h3>
+<div class="tbl"><table id="stratTable"></table></div>
+</div>
+
+<div class="section">
+<h2>🔬 Methodology</h2>
+<ul id="method"></ul>
+<p class="note"><strong>Note:</strong> Random play baseline. 1,000 games per test gives a margin of about ±3 percentage points on a game win rate, so differences smaller than that (for example Gen 8's 46.6% side win rate) are noise.</p>
+</div>
+
+<footer class="footer">
+<p>Analysis generated: October 25, 2026 · Data: PokeAPI (Gen 1 via the Databricks data_lake gold layer)</p>
+<p style="margin-top:10px;font-size:.9em">📊 Data analysis • 🎮 Pokemon strategy • 💻 Interactive visualization · <a href="https://flaakira.github.io/pokemon-analysis.html">Gen 1 study</a></p>
+</footer>
+</div>
+
+<script>
+const D={"totalGames":46000,"totalRounds":440056,"minAppear":414,"validate":{"win":50.3,"avgR":9.56,"rounds":95618,"top":[["Mewtwo",87.8],["Dragonite",87.2],["Mew",83.6]]},"top20":[["Zekrom",5,"dragon",89.6,580,1004],["Arceus",4,"normal",88.5,600,1364],["Reshiram",5,"dragon",88,580,1110],["Palkia",4,"water",87.1,590,1301],["Rayquaza",3,"dragon",85.6,575,1209],["Koraidon",9,"fighting",84.5,570,1215],["Dialga",4,"steel",84.3,580,1259],["Zacian",8,"fairy",83.5,568,1454],["Miraidon",9,"electric",83.2,570,1126],["Zamazenta",8,"fighting",83.1,568,1409],["Latios",3,"dragon",83,520,1056],["Xerneas",6,"fairy",82.7,554,1965],["Kommo-o",7,"dragon",82.7,525,1579],["Yveltal",6,"dark",82.6,554,1858],["Mewtwo",1,"psychic",82.4,574,968],["Kyurem",5,"dragon",82.4,535,979],["Latias",3,"dragon",81.5,520,1016],["Lugia",2,"psychic",81.5,574,1362],["Eternatus",8,"poison",81.1,550,1447],["Regigigas",4,"normal",81,560,1251]],"bottom20":[["Igglybuff",2,"normal",2.8,120,611],["Wishiwashi",7,"water",4.4,130,700],["Azurill",3,"normal",4.6,140,505],["Snom",8,"ice",5.7,155,630],["Kakuna",1,"bug",5.9,160,425],["Sunkern",2,"grass",6,150,675],["Wurmple",3,"bug",6.1,150,443],["Cosmog",7,"psychic",6.2,157,701],["Jigglypuff",1,"normal",6.2,155,451],["Bidoof",4,"normal",6.6,191,606],["Sentret",2,"normal",6.7,180,608],["Metapod",1,"bug",6.9,155,423],["Makuhita",3,"fighting",7,165,478],["Wooper",2,"water",7.1,155,631],["Caterpie",1,"bug",7.2,150,414],["Kricketot",4,"bug",7.3,157,555],["Cascoon",3,"bug",7.5,155,460],["Scatterbug",6,"bug",8.6,162,893],["Bounsweet",7,"grass",8.8,168,693],["Poochyena",3,"dark",8.9,185,515]],"tiers":{"S":25,"A":55,"B":176,"C":389,"D":281,"F":99},"tierS":[["Zekrom",89.6],["Arceus",88.5],["Reshiram",88],["Palkia",87.1],["Rayquaza",85.6],["Koraidon",84.5],["Dialga",84.3],["Zacian",83.5],["Miraidon",83.2],["Zamazenta",83.1],["Latios",83],["Xerneas",82.7],["Kommo-o",82.7],["Yveltal",82.6],["Mewtwo",82.4],["Kyurem",82.4],["Latias",81.5],["Lugia",81.5],["Eternatus",81.1],["Regigigas",81],["Ho-Oh",81],["Solgaleo",80.9],["Groudon",80.2],["Genesect",80],["Dragonite",80]],"tierA":["Metagross","Giratina","Salamence","Lunala","Kyogre","Garchomp","Magearna","Zygarde","Mesprit","Dragapult","Darkrai","Baxcalibur"],"tierAcount":55,"types":[["dragon",63.7,36685,37],["steel",58.6,35979,36],["psychic",54.1,60228,60],["fire",53.9,60807,66],["fighting",53.6,35595,40],["dark",52.8,39420,45],["ghost",52.6,31893,35],["electric",52.2,52131,59],["poison",52.1,34806,42],["fairy",52.1,29950,29],["flying",51.4,8940,9],["rock",49.5,50429,58],["water",48.7,110684,134],["ground",48.5,30452,40],["grass",47,84679,103],["ice",45.2,24794,31],["normal",41.8,90502,118],["bug",41.3,62138,83]],"bestMU":[["fire vs bug",85.7,4181],["flying vs bug",83.9,627],["fire vs grass",83.2,5955],["electric vs flying",81.1,537],["poison vs grass",81,3382],["steel vs rock",80.8,2072],["fire vs ice",80.7,1717],["rock vs flying",79.6,531],["flying vs grass",79.5,819],["steel vs fairy",78.3,1247]],"worstMU":[["bug vs fire",14.3,4181],["bug vs flying",16.1,627],["grass vs fire",16.8,5955],["flying vs electric",18.9,537],["grass vs poison",19,3382],["rock vs steel",19.2,2072],["ice vs fire",19.3,1717],["flying vs rock",20.4,531],["grass vs flying",20.5,819],["fairy vs steel",21.7,1247]],"gens":[{"g":1,"pkmn":151,"win":49.6,"avgR":9.55,"rounds":9555,"draws":281,"avgBst":343,"best":[["Mewtwo",89.4],["Dragonite",87.6],["Mew",83.4]],"worst":[["Jigglypuff",5.9],["Pidgey",6.8],["Caterpie",7]],"vsOthers":40.3,"allGenRound":47.9},{"g":2,"pkmn":100,"win":50.7,"avgR":9.51,"rounds":9510,"draws":282,"avgBst":336,"best":[["Lugia",84.3],["Ho-Oh",83.2],["Celebi",82.5]],"worst":[["Sunkern",5.8],["Igglybuff",6.1],["Sentret",12.1]],"vsOthers":40.1,"allGenRound":44.6},{"g":3,"pkmn":135,"win":49.8,"avgR":9.57,"rounds":9573,"draws":310,"avgBst":338,"best":[["Rayquaza",85.8],["Latias",84.9],["Latios",84]],"worst":[["Azurill",7.3],["Wynaut",8.6],["Poochyena",9.2]],"vsOthers":40.7,"allGenRound":46.3},{"g":4,"pkmn":107,"win":50.8,"avgR":9.41,"rounds":9410,"draws":184,"avgBst":372,"best":[["Arceus",89.5],["Palkia",82.5],["Dialga",81.4]],"worst":[["Bidoof",2.4],["Kricketot",6.9],["Shinx",11.2]],"vsOthers":58.7,"allGenRound":52.5},{"g":5,"pkmn":156,"win":52.6,"avgR":9.54,"rounds":9540,"draws":250,"avgBst":355,"best":[["Reshiram",90.9],["Zekrom",88.2],["Genesect",87.9]],"worst":[["Patrat",6.8],["Pidove",9.4],["Purrloin",13.1]],"vsOthers":46.5,"allGenRound":48.7},{"g":6,"pkmn":72,"win":50.8,"avgR":9.37,"rounds":9369,"draws":93,"avgBst":360,"best":[["Xerneas",82.4],["Yveltal",81.3],["Zygarde",75.4]],"worst":[["Scatterbug",2.5],["Bunnelby",7.1],["Spewpa",9.2]],"vsOthers":49.8,"allGenRound":51.3},{"g":7,"pkmn":88,"win":50.6,"avgR":9.38,"rounds":9382,"draws":113,"avgBst":378,"best":[["Magearna",81.3],["Kommo-o",81],["Lunala",77.1]],"worst":[["Cosmog",3.8],["Wishiwashi",5.5],["Bounsweet",9.8]],"vsOthers":59.3,"allGenRound":52.5},{"g":8,"pkmn":96,"win":46.6,"avgR":9.47,"rounds":9468,"draws":242,"avgBst":366,"best":[["Zacian",86.8],["Eternatus",81.1],["Zamazenta",79.2]],"worst":[["Snom",3.7],["Blipbug",7.1],["Skwovet",9.5]],"vsOthers":53.9,"allGenRound":51.4},{"g":9,"pkmn":120,"win":51.1,"avgR":9.52,"rounds":9519,"draws":166,"avgBst":380,"best":[["Koraidon",86],["Miraidon",82.6],["Gholdengo",73.4]],"worst":[["Tarountula",3.4],["Lechonk",8.1],["Nymble",8.6]],"vsOthers":60.6,"allGenRound":56}],"matrix":[[null,51.5,49.8,31.4,43.2,40.1,34.1,38.6,33.7],[48.5,null,49,33.1,43.9,41.6,36.5,38.7,29.6],[50.2,51,null,33.1,44,43.2,33.1,37.2,33.8],[68.6,66.9,66.9,null,58.6,56.3,49.1,54.7,48.7],[56.8,56.1,56,41.4,null,46.3,37.7,42.9,34.9],[59.9,58.4,56.8,43.7,53.7,null,41.4,45.2,39.5],[65.9,63.5,66.9,50.9,62.3,58.6,null,55.8,50.5],[61.4,61.3,62.8,45.3,57.1,54.8,44.2,null,44.6],[66.3,70.4,66.2,51.3,65.1,60.5,49.5,55.4,null]],"allGen":{"win":48.3,"avgR":9.48,"rounds":9485,"pkmn":1025,"draws":202},"allGenTop":[["Arceus",95.2,31],["Zamazenta",93.8,32],["Dialga",91.3,23],["Lugia",91.2,17],["Groudon",90.9,11]],"corr":0.98,"bst":[["0-299",334,23.6],["300-399",281,47],["400-499",331,61.1],["500-579",74,73.7],["580+",5,87.5]],"drawRate":2.2};
+const $=id=>document.getElementById(id);
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const f1=n=>n.toFixed(1)+'%';
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
+const TC={normal:"#9098a1",fire:"#e0603f",water:"#4f8fd6",grass:"#4dad5b",electric:"#d8b429",ice:"#61c9d1",fighting:"#cf4064",poison:"#a566c9",ground:"#c7844a",flying:"#8fa8dd",psychic:"#f2688f",bug:"#8cb230",rock:"#b8ab6a",ghost:"#6b6bbd",dragon:"#4f66c9",dark:"#5c5366",steel:"#5a8ea2",fairy:"#e58fce"};
+const REG=["","Kanto","Johto","Hoenn","Sinnoh","Unova","Kalos","Alola","Galar","Paldea"];
+const gens=D.gens,byVs=gens.slice().sort((a,b)=>b.vsOthers-a.vsOthers);
+
+// KPIs
+$('kpis').innerHTML=[[D.totalGames.toLocaleString(),'Games'],[Math.round(D.totalRounds/1000)+'k','Rounds'],['1,025','Pokemon'],[(D.totalRounds/D.totalGames).toFixed(2),'Avg Rounds'],['Gen '+byVs[0].g,'Strongest Gen ('+f1(byVs[0].vsOthers)+')'],[D.tierS[0][0],'Top Card ('+f1(D.tierS[0][1])+')']].map(k=>'<div class="stat-box"><div class="stat-value">'+k[0]+'</div><div class="stat-label">'+k[1]+'</div></div>').join('');
+
+// tests
+$('tests').innerHTML=[['9,000','Each generation alone','1,000 games per gen, both teams from the same gen (Gen 1 to Gen 9).'],['36,000','Generation vs generation','All 36 pairings, 1,000 games each: your team from one gen, the CPU\'s from another.'],['1,000','All generations','Both teams drawn from all 1,025 Pokemon.'],['10,000','Validation run','Gen 1 only, to check the simulator against the original study (not counted in the totals).']].map(t=>'<div class="test"><b>'+t[0]+'</b><h3>'+t[1]+'</h3><p>'+t[2]+'</p></div>').join('');
+
+// gen charts
+const base={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
+new Chart($('genVsChart'),{type:'bar',data:{labels:gens.map(g=>'Gen '+g.g),datasets:[{label:'Win rate vs other gens',data:gens.map(g=>g.vsOthers),backgroundColor:gens.map(g=>g.vsOthers>=50?'rgba(102,126,234,0.85)':'rgba(173,181,189,0.8)'),borderRadius:5}]},options:{...base,plugins:{legend:{display:false},title:{display:true,text:'Game win rate against the other 8 generations'}},scales:{y:{min:30,max:70,ticks:{callback:v=>v+'%'}}}}});
+new Chart($('genBstChart'),{type:'bar',data:{labels:gens.map(g=>'Gen '+g.g),datasets:[{label:'Average stat total',data:gens.map(g=>g.avgBst),backgroundColor:'rgba(118,75,162,0.75)',borderRadius:5}]},options:{...base,plugins:{legend:{display:false},title:{display:true,text:'Average stat total per Pokemon (5 stats, no HP)'}},scales:{y:{min:300,max:400}}}});
+$('genTable').innerHTML='<tr><th>Gen</th><th>Region</th><th class="n">Pokemon</th><th class="n">Avg stat total</th><th class="n">Side win rate (same gen)</th><th class="n">Avg rounds</th><th class="n">Win rate vs other gens</th><th class="n">Round win % in all-gen games</th><th>Best cards</th><th>Weakest cards</th></tr>'+gens.map(g=>'<tr><td><b>Gen '+g.g+'</b></td><td>'+REG[g.g]+'</td><td class="n">'+g.pkmn+'</td><td class="n">'+g.avgBst+'</td><td class="n">'+f1(g.win)+'</td><td class="n">'+g.avgR.toFixed(2)+'</td><td class="n"><b>'+f1(g.vsOthers)+'</b></td><td class="n">'+f1(g.allGenRound)+'</td><td class="cards">'+g.best.map(b=>esc(b[0])+' '+b[1]+'%').join('<br>')+'</td><td class="cards">'+g.worst.map(b=>esc(b[0])+' '+b[1]+'%').join('<br>')+'</td></tr>').join('');
+
+// matrix
+function heat(v){const t=Math.max(-1,Math.min(1,(v-50)/25));const a=Math.abs(t);return t>=0?'rgba(105,219,124,'+(0.15+a*0.75)+')':'rgba(255,135,135,'+(0.15+a*0.75)+')';}
+let mh='<tr><th>Row vs Col</th>'+[1,2,3,4,5,6,7,8,9].map(g=>'<th>Gen '+g+'</th>').join('')+'<th>Avg</th></tr>';
+D.matrix.forEach((row,i)=>{mh+='<tr><td><b>Gen '+(i+1)+'</b></td>'+row.map(v=>v===null?'<td class="self">-</td>':'<td style="background:'+heat(v)+'">'+v.toFixed(1)+'</td>').join('')+'<td><b>'+gens[i].vsOthers.toFixed(1)+'</b></td></tr>';});
+$('matrix').innerHTML=mh;
+
+// types
+new Chart($('typeChart'),{type:'bar',data:{labels:D.types.map(t=>cap(t[0])+' ('+t[3]+')'),datasets:[{label:'Round win %',data:D.types.map(t=>t[1]),backgroundColor:D.types.map(t=>TC[t[0]]),borderRadius:5}]},options:{...base,indexAxis:'y',scales:{x:{min:30,max:70,ticks:{callback:v=>v+'%'}}}}});
+
+// matchups
+const lab=s=>s.split(' vs ').map(cap).join(' vs ');
+new Chart($('bestChart'),{type:'bar',data:{labels:D.bestMU.map(m=>lab(m[0])),datasets:[{label:'Win Rate %',data:D.bestMU.map(m=>m[1]),backgroundColor:'rgba(102,126,234,0.8)',borderColor:'#667eea',borderWidth:2,borderRadius:5}]},options:{...base,indexAxis:'y',plugins:{legend:{display:false},title:{display:true,text:'Best type matchups'}},scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}});
+new Chart($('worstChart'),{type:'bar',data:{labels:D.worstMU.map(m=>lab(m[0])),datasets:[{label:'Win Rate %',data:D.worstMU.map(m=>m[1]),backgroundColor:'rgba(233,236,239,0.8)',borderColor:'#adb5bd',borderWidth:2,borderRadius:5}]},options:{...base,indexAxis:'y',plugins:{legend:{display:false},title:{display:true,text:'Worst type matchups'}},scales:{x:{beginAtZero:true,max:30,ticks:{callback:v=>v+'%'}}}}});
+
+// pokemon
+const topP=D.top20.slice(0,10),botP=D.bottom20.slice(0,10);
+new Chart($('topChart'),{type:'bar',data:{labels:topP.map(c=>c[0]+' (G'+c[1]+')'),datasets:[{label:'Win Rate %',data:topP.map(c=>c[3]),backgroundColor:['#ff6b6b','#ff8787','#ff9999','#ffa94d','#ffbb78','#ffc078','#ffb366','#74c0fc','#91caff','#a5d8ff'],borderRadius:5}]},options:{...base,indexAxis:'y',plugins:{legend:{display:false},title:{display:true,text:'Top 10 strongest'}},scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}});
+new Chart($('bottomChart'),{type:'bar',data:{labels:botP.map(c=>c[0]+' (G'+c[1]+')'),datasets:[{label:'Win Rate %',data:botP.map(c=>c[3]),backgroundColor:'#e9ecef',borderColor:'#adb5bd',borderWidth:1,borderRadius:5}]},options:{...base,indexAxis:'y',plugins:{legend:{display:false},title:{display:true,text:'Top 10 weakest'}},scales:{x:{beginAtZero:true,max:20,ticks:{callback:v=>v+'%'}}}}});
+const ptab=rows=>'<tr><th>#</th><th>Pokemon</th><th>Gen</th><th>Type</th><th class="n">Stat total</th><th class="n">Round win %</th></tr>'+rows.map((c,i)=>'<tr><td>'+(i+1)+'</td><td><b>'+esc(c[0])+'</b></td><td>'+c[1]+'</td><td><span style="color:'+TC[c[2]]+';font-weight:bold">'+cap(c[2])+'</span></td><td class="n">'+c[4]+'</td><td class="n">'+f1(c[3])+'</td></tr>').join('');
+$('topTable').innerHTML=ptab(D.top20);$('botTable').innerHTML=ptab(D.bottom20);
+
+// bst buckets
+new Chart($('bstChart'),{type:'bar',data:{labels:D.bst.map(b=>b[0]+' ('+b[1]+' Pokemon)'),datasets:[{label:'Average round win %',data:D.bst.map(b=>b[2]),backgroundColor:['#e9ecef','#a5d8ff','#74c0fc','#ffa94d','#ff6b6b'],borderRadius:5}]},options:{...base,plugins:{legend:{display:false},title:{display:true,text:'Average round win rate by stat total'}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}});
+
+// insights
+const t0=D.types[0],tl=D.types[D.types.length-1],tn=D.types[D.types.length-2],g1=gens[0],weak3=byVs.slice(-3).map(g=>g.g).sort();
+const ins=[
+['⚡ '+D.tierS[0][0]+' Dominance','<strong>'+f1(D.tierS[0][1])+' round win rate</strong> - the strongest card in all 9 generations, ahead of '+D.tierS[1][0]+' ('+f1(D.tierS[1][1])+') and '+D.tierS[2][0]+' ('+f1(D.tierS[2][1])+'). Gen 1\'s Mewtwo, the original champion, drops to '+f1(D.top20.find(c=>c[0]==='Mewtwo')[3])+' against the wider field.'],
+['🆕 Newer Gens Hit Harder','<strong>Gen '+byVs[0].g+' wins '+f1(byVs[0].vsOthers)+'</strong> of games against other generations, with Gen '+byVs[1].g+' ('+f1(byVs[1].vsOthers)+') and Gen '+byVs[2].g+' ('+f1(byVs[2].vsOthers)+') close behind. Gens '+weak3.join(', ')+' only win about 40%.'],
+['🐉 Dragon Type Supremacy','<strong>'+f1(t0[1])+' of rounds</strong> - Dragon is the best primary type across all generations, followed by '+cap(D.types[1][0])+' ('+f1(D.types[1][1])+'). In Gen 1 alone it was carried by Dragonite.'],
+['🔥 Fire Still Burns Bug','<strong>'+f1(D.bestMU[0][1])+' '+lab(D.bestMU[0][0])+'</strong> - still the most one-sided matchup with 9 generations of data ('+D.bestMU[0][2].toLocaleString()+' rounds). Fire vs Grass follows at '+f1(D.bestMU.find(m=>m[0]==='fire vs grass')[1])+'.'],
+['🐛 Bug and Normal Struggle','<strong>'+cap(tl[0])+' '+f1(tl[1])+', '+cap(tn[0])+' '+f1(tn[1])+'</strong> - the two weakest primary types. Both are full of early-stage Pokemon with low stats.'],
+['❌ Baby and First-Stage Risk','<strong>'+D.bottom20[0][0]+' '+f1(D.bottom20[0][3])+'</strong> is the weakest card in the game. '+D.bst[0][1]+' Pokemon with a stat total under 300 win only '+f1(D.bst[0][2])+' of their rounds on average.'],
+['⚖️ The Game Is Fair','<strong>'+f1(Math.min(...gens.map(g=>g.win)))+' to '+f1(Math.max(...gens.map(g=>g.win)))+'</strong> side win rate in single-gen games. Neither you nor the CPU has a built-in edge: the cards decide the match.'],
+['🎲 Type Balance Across Gens','<strong>Gen 1 vs Gen 2: '+f1(D.matrix[0][1])+'</strong> - the original three generations are almost perfectly balanced with each other. Gen 4 and later cards carry higher base stats.']
+];
+$('insights').innerHTML=ins.map(i=>'<div class="insight-card"><h3>'+i[0]+'</h3><p>'+i[1]+'</p></div>').join('');
+
+// tiers
+const T=D.tiers;
+$('tierTable').innerHTML='<tr><th>Tier</th><th>Win Rate</th><th class="n">Pokemon</th><th>Examples</th><th>Strategy</th></tr>'+
+'<tr><td><span class="tier-s">S-Tier</span></td><td>&gt;80%</td><td class="n">'+T.S+'</td><td>'+D.tierS.slice(0,10).map(x=>esc(x[0])).join(', ')+'</td><td>Game-changing - almost always win their round</td></tr>'+
+'<tr><td><span class="tier-a">A-Tier</span></td><td>70-80%</td><td class="n">'+T.A+'</td><td>'+D.tierA.slice(0,8).map(esc).join(', ')+'</td><td>Strong consistent performers</td></tr>'+
+'<tr><td>B-Tier</td><td>60-70%</td><td class="n">'+T.B+'</td><td>Mostly fully evolved Pokemon</td><td>Solid with good type matchups</td></tr>'+
+'<tr><td>C-Tier</td><td>40-60%</td><td class="n">'+T.C+'</td><td>Most mid-stage Pokemon</td><td>Average - pick based on matchups</td></tr>'+
+'<tr><td>D-Tier</td><td>20-40%</td><td class="n">'+T.D+'</td><td>First stages and weak single-stage Pokemon</td><td>Usually lose unless the type matchup helps</td></tr>'+
+'<tr><td><span class="tier-f">F-Tier</span></td><td>&lt;20%</td><td class="n">'+T.F+'</td><td>'+D.bottom20.slice(0,6).map(x=>esc(x[0])).join(', ')+'</td><td>Severe liabilities</td></tr>';
+
+// recommendations
+$('recGen').innerHTML=[
+'<strong>For the hardest challenge, pit an old gen against a new one:</strong> with random stat picks, a Gen 1 team beats a Gen 9 team only '+f1(D.matrix[0][8])+' of the time.',
+'<strong>For the fairest match, use a single generation or All gens:</strong> both sides draw from the same pool, so each wins about half the time ('+f1(D.allGen.win)+' in the all-gen test).',
+'<strong>Gens 1-3 are balanced with each other:</strong> every pairing between them sits within about 1.5 points of 50%.',
+'<strong>Legendaries decide all-gen games:</strong> with 1,025 cards, the '+T.S+' S-tier Pokemon show up in only about '+Math.round((1-Math.pow(1-T.S/1025,6))*100)+'% of teams, but when they do, they almost always win their round.',
+'<strong>Low-stat Pokemon are liabilities in every generation:</strong> each gen\'s weakest cards win under 15% of their rounds.'
+].map(x=>'<li>'+x+'</li>').join('');
+const tf=t=>D.types.find(x=>x[0]===t);
+$('stratTable').innerHTML='<tr><th>Strategy</th><th>Primary Type</th><th>Best Matchups</th><th class="n">Overall round win %</th></tr>'+
+[['Aggressive','Fire','Bug, Grass, Ice','fire'],['Powerhouse','Dragon','Strong against almost every type','dragon'],['Defensive','Steel','Rock, Fairy','steel'],['Avoid','Bug / Normal','Weak against Fire and Flying','bug']].map(r=>'<tr><td><strong>'+r[0]+'</strong></td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="n">'+f1(tf(r[3])[1])+'</td></tr>').join('');
+
+// method
+$('method').innerHTML=[
+D.totalGames.toLocaleString()+' simulated 6v6 games ('+D.totalRounds.toLocaleString()+' rounds) using the live game\'s rules and data: all 1,025 Pokemon from PokeAPI',
+'Random team draws (Fisher-Yates shuffle); in single-pool tests no card appears on both teams',
+'Random stat selection for both sides, including the blocked-stat rule after a draw',
+'Primary-type effectiveness only (1.2x super effective, 0.8x not very effective, immunities count as 1x), as in the game',
+'Round win rate = rounds won / rounds played, with draws ('+f1(D.drawRate)+' of rounds) counted as half a win',
+'Card and type rankings pool every round from all tests; generation pairings swap sides every game',
+'Validation: a 10,000-game Gen 1 run gives '+f1(D.validate.win)+' side win rate and '+D.validate.avgR+' average rounds, with '+D.validate.top.map(x=>x[0]+' '+x[1]+'%').join(', ')+' on top. That closely matches the original study (49.44%, 9.51 rounds, Mewtwo 87.2%, Dragonite 85.6%, Mew 81.9%).',
+'Seeded random generator, so every number on this page can be reproduced'
+].map(x=>'<li>'+x+'</li>').join('');
+</script>
+</body>
+</html>
